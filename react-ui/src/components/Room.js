@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Video from 'twilio-video';
 import Player from './Player';
 import * as faceapi from '@vladmandic/face-api';
+import Anime, { anime } from 'react-anime';
+
+let colors = [ 'blue', 'green', 'red' ];
 
 const statuses = [
 	'before-start',
@@ -139,7 +142,6 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 
 	return(
 		<div className="room">
-<<<<<<< HEAD
 			<div id="sidebar">
 				<div className="videos">
 					{room ? (
@@ -157,7 +159,11 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				<button onClick={handleLogout} style={{position: "absolute", bottom: 0}}>Log out</button>
 			</div>
 			<div id="main">
-				<h2>Room: {roomCode}</h2>
+				
+				
+				<Anime delay={anime.stagger(100)} scale={[ 0.1, 0.9 ] } loop={true}>
+					<h2 id='test'>Room: {roomCode}</h2>
+    			</Anime>
 				{status === 'before-start' && <button onClick={handleStartGame}>Start Game</button>}
 				{(status === 'prompt') && <h1>{`${prompt}`}</h1>/*display prompt for everyone*/ }
 				{(status === 'prompt' && yourTurn) && ( 
