@@ -15,6 +15,8 @@ const twilioClient = new twilio(
 
 const games = {};
 
+
+
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
@@ -72,7 +74,9 @@ io.on("connection", socket => {
 
 		games[roomSid] = roomInfo;
 		io.emit('game-started');
-		io.to(order[roomInfo.curIndex]).emit('your-turn');
+		number_turns = order.length;
+		console.log(number_turns)
+		io.to(order[roomInfo.curIndex]).emit('your-turn', {prompt_num: number_turns});
 	});
 
 	socket.on('reveal-joke', (data) => {
@@ -82,15 +86,22 @@ io.on("connection", socket => {
 			io.emit('turn-finished');
 		}, 10000);
 	})
-
-	socket.on('next-turn', ({ playerSid, roomSid }) => {
+	socket.on('prompt', ({prompt})=>{
+		io.emit('update_prompt', {prompt: prompt})
+		console.log(prompt)
+	})
+	socket.on('update_num_turns', ({num_turns})=>{
+		io.emit('UPDATE_NUM_TURNS', {num_turns: num_turns})
+		//console.log(num_turns);
+	})
+	socket.on('next-turn', ({ playerSid, roomSid, num_turns }) => {
 		games[roomSid].curIndex++;
 		if (games[roomSid].curIndex >= games[roomSid].order.length) {
 			io.emit('game-ended')
 			return;
 		}
 
-		io.to(games[roomSid].order[games[roomSid].curIndex]).emit('your-turn');
+		io.to(games[roomSid].order[games[roomSid].curIndex]).emit('your-turn', {prompt_num: num_turns});
 	})
 
 	socket.on('my-turn', ({ playerSid }) => {
