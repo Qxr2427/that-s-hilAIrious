@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Video from 'twilio-video';
 import Player from './Player';
+import * as faceapi from '@vladmandic/face-api';
 
 const statuses = [
 	'before-start',
@@ -18,7 +19,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 	const [status, setStatus] = useState(statuses[0]);
 	const [yourTurn, setYourTurn] = useState(false);
 
-	const otherPlayers = players.map(p => <Player key={p.sid} player={p} />);
+	const otherPlayers = players.map(p => <Player key={p.sid} player={p} socket={socket} />);
 
 	const handleStartGame = useCallback(() => {
 		socket.emit('start-game', {
@@ -45,7 +46,12 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		const playerJoined = player => setPlayers(prev => [...prev, player]);
 		const playerLeft = player => setPlayers(prev => prev.filter(x => x !== player));
 
-		Video.connect(token, { name: roomCode }).then(room => {
+		Video.connect(token, { name: roomCode }).then(async room => {
+			await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+			await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+			await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+			await faceapi.nets.faceExpressionNet.loadFromUri('/models');
+
 			setRoom(room);
 			room.on('participantConnected', playerJoined);
 			room.on('participantDisconnected', playerLeft);
@@ -101,8 +107,10 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
       <div className="this-player">
         {room ? (
 					<Player
+						isLocalParticipant={true}
             key={room.localParticipant.sid}
             player={room.localParticipant}
+						socket={socket}
           />
         ) : (
           ''
