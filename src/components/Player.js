@@ -46,48 +46,48 @@ const Player = ({ isLocalParticipant, player, socket }) => {
       .map((publication) => publication.track)
       .filter((track) => track !== null);
 
-	useEffect(() => {
-		if (!isLocalParticipant) return;
+	// useEffect(() => {
+	// 	if (!isLocalParticipant) return;
 
-		var prevX = 100
-    var prevY = 100
-    var running_average_array = [60, 60, 60, 60, 60]
-    let flag = false
-    let maxscore = 60
-    let referenceMouth = 0
-    let cur_average
-    setInterval(async () => {
-      const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
+	// 	var prevX = 100
+  //   var prevY = 100
+  //   var running_average_array = [60, 60, 60, 60, 60]
+  //   let flag = false
+  //   let maxscore = 60
+  //   let referenceMouth = 0
+  //   let cur_average
+  //   setInterval(async () => {
+  //     const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
 
-			if (!detections[0])	return;
+	// 		if (!detections[0])	return;
 
-      let diffX = Math.abs(prevX - detections[0].detection._box.x )
-      let diffY = Math.abs(prevY - detections[0].detection._box.y )
-      prevX = detections[0].detection._box.x
-      prevY = detections[0].detection._box.y
-      let happy = detections[0].expressions.happy
-      let mouth = detections[0].landmarks.positions[57].y - detections[0].landmarks.positions[51].y
+  //     let diffX = Math.abs(prevX - detections[0].detection._box.x )
+  //     let diffY = Math.abs(prevY - detections[0].detection._box.y )
+  //     prevX = detections[0].detection._box.x
+  //     prevY = detections[0].detection._box.y
+  //     let happy = detections[0].expressions.happy
+  //     let mouth = detections[0].landmarks.positions[57].y - detections[0].landmarks.positions[51].y
 
-      console.log(happy)
-      // console.log(diffX)
-      // console.log(diffY)
-      // console.log(mouth - referenceMouth)
-      // console.log(referenceMouth)
-      if(!flag){
-        referenceMouth = mouth - 8
-        flag=true
-      }
-      var cur_score = score(happy, (mouth - referenceMouth) * 0.042, diffX, diffY)
-			// console.log(cur_score);
+  //     console.log(happy)
+  //     // console.log(diffX)
+  //     // console.log(diffY)
+  //     // console.log(mouth - referenceMouth)
+  //     // console.log(referenceMouth)
+  //     if(!flag){
+  //       referenceMouth = mouth - 8
+  //       flag=true
+  //     }
+  //     var cur_score = score(happy, (mouth - referenceMouth) * 0.042, diffX, diffY)
+	// 		// console.log(cur_score);
       
-      running_average_array.shift()
-      running_average_array.push(cur_score)
-      cur_average = runningavg(running_average_array)
-      maxscore = Math.max (cur_average, maxscore)
+  //     running_average_array.shift()
+  //     running_average_array.push(cur_score)
+  //     cur_average = runningavg(running_average_array)
+  //     maxscore = Math.max (cur_average, maxscore)
 
-      socket.emit('cur_score', {current_score: cur_average})
-		}, 500);
-	})
+  //     socket.emit('cur_score', {current_score: cur_average})
+	// 	}, 500);
+	// })
 
   useEffect(() => {
     setVideoTracks(trackpubsToTracks(player.videoTracks));

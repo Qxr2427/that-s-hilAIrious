@@ -15,13 +15,22 @@ const statuses = [
 
 var txt;
 
+const prompts = [
+	'prompt 1',
+	'prompt 2',
+	'prompt 3',
+	'prompt 4'
+]
+
+
 const Room = ({ socket, roomCode, token, handleLogout }) => {
 	const [room, setRoom] = useState(null);
 	const [players, setPlayers] = useState([]);
 	const [status, setStatus] = useState(statuses[0]);
 	const [yourTurn, setYourTurn] = useState(false);
 	const [joke, setjoke] = useState('');
-
+	const [prompt, setprompt] = useState('');
+	const [numturns, setnumturns] = useState(0);
 	const otherPlayers = players.map(p => <Player key={p.sid} player={p} socket={socket} />);
 
 	const handleStartGame = useCallback(() => {
@@ -42,7 +51,8 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		socket.emit('reveal-joke', {
 			playerSid: room.localParticipant.sid,
 			roomSid: room.sid,
-			text: joke
+			text: joke,
+			//num_turns: numturns - 1
 			//need to get the form data somehow
 		});
 		return false;
@@ -52,6 +62,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		socket.emit('next-turn', {
 			playerSid: room.localParticipant.sid,
 			roomSid: room.sid,
+			num_turns: numturns - 1
 		});
 	}, [room]);
 
@@ -71,17 +82,25 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			room.participants.forEach(playerJoined);
 
 			socket.on('game-started', () => {
-				setStatus(statuses[1])
+				setStatus(statuses[1]) 
 			});
-			socket.on('your-turn', () => {
-				setStatus(statuses[2]);
+			socket.on('your-turn', ({prompt_num}) => {
+				 //prompt status
+				//choose prompt
+				setprompt(prompts[prompt_num]);
+				socket.emit('prompt', {prompt: prompts[prompt_num]});
+				setnumturns(prompt_num);
 				setYourTurn(true);
+				setStatus(statuses[2]);
 				socket.emit('my-turn', { playerSid: room.localParticipant.sid });
 			});
 			socket.on('others-turn', ({ otherSid }) => {
 				setStatus(statuses[2]);
 				setYourTurn(false);
 			});
+			socket.on('update-prompt', ({prompt})=>{
+				setprompt(prompt);
+			})
 			socket.on('joke-revealed', ({joke}) => {
 				setStatus(statuses[4]);
 				console.log(joke);
@@ -119,9 +138,10 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			<p>Your turn? {`${yourTurn}`}</p>
 			<p>CURRENT JOKE? {`${joke}`}</p>
 			{status === 'before-start' && <button onClick={handleStartGame}>Start Game</button>}
+			{(status === 'prompt') && <h1>{`${prompt}`}</h1>/*display prompt for everyone*/ }
 			{(status === 'prompt' && yourTurn) && ( <div id ="test">
 			
-			<form id ="test" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
+			<form class="prompt" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
 			<input
 				type="text"
 				id="joke"

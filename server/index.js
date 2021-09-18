@@ -14,6 +14,8 @@ const twilioClient = new twilio(
 
 const games = {};
 
+
+
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
@@ -66,7 +68,8 @@ io.on("connection", socket => {
 
 		games[roomSid] = roomInfo;
 		io.emit('game-started');
-		io.to(order[roomInfo.curIndex]).emit('your-turn');
+		number_turns = length(order);
+		io.to(order[roomInfo.curIndex]).emit('your-turn', {prompt_num: number_turns});
 	});
 
 	socket.on('reveal-joke', (data) => {
@@ -76,7 +79,9 @@ io.on("connection", socket => {
 			io.emit('turn-finished');
 		}, 10000);
 	})
-
+	socket.on('prompt', ({prompt})=>{
+		io.emit('update_prompt', {prompt: prompt})
+	})
 	socket.on('next-turn', ({ playerSid, roomSid }) => {
 		games[roomSid].curIndex++;
 		if (games[roomSid].curIndex >= games[roomSid].order.length) {
@@ -84,7 +89,7 @@ io.on("connection", socket => {
 			return;
 		}
 
-		io.to(games[roomSid].order[games[roomSid].curIndex]).emit('your-turn');
+		io.to(games[roomSid].order[games[roomSid].curIndex]).emit('your-turn', {num: floor((Math.random())*3)});
 	})
 
 	socket.on('my-turn', ({ playerSid }) => {
