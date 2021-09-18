@@ -5,7 +5,11 @@
   "dependencies": {
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
-    "react-scripts": "^3.4.0"
+    "react-scripts": "^3.4.0",
+    "socket.io": "^4.2.0",
+    "socket.io-client": "^4.2.0",
+    "twilio": "^3.67.2",
+    "twilio-video": "^2.17.0"
   },
   "scripts": {
     "start": "react-scripts start",

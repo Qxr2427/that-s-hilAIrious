@@ -1,60 +1,57 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React, { useState, useCallback } from 'react';
+import Lobby from './components/Lobby'
+import Room from './components/Room'
+import { io } from 'socket.io-client';
 import './App.css';
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      name: '',
-      greeting: ''
-    };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
+const socket = io('/');
 
-  handleChange(event) {
-    this.setState({ name: event.target.value });
-  }
+const App = () => {
+	const [name, setName] = useState('');
+	const [roomCode, setRoomCode] = useState('');
+	const [token, setToken] = useState('');
 
-  handleSubmit(event) {
-    event.preventDefault();
-    fetch(`/api/greeting?name=${encodeURIComponent(this.state.name)}`)
-      .then(response => response.json())
-      .then(state => this.setState(state));
-  }
+	const handleNameChange = useCallback(event => setName(event.target.value), []);
+	const handleRoomCodeChange = useCallback(event => setRoomCode(event.target.value), []);
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <form onSubmit={this.handleSubmit}>
-            <label htmlFor="name">Enter your name: </label>
-            <input
-              id="name"
-              type="text"
-              value={this.state.name}
-              onChange={this.handleChange}
-            />
-            <button type="submit">Submit</button>
-          </form>
-          <p>{this.state.greeting}</p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+	const handleSubmit = useCallback(async event => {
+		event.preventDefault();
+		const data = await fetch('/token', {
+			method: 'POST',
+			body: JSON.stringify({
+				name,
+				roomCode,
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}).then(res => res.json());
+		setToken(data.token);
+	}, [name, roomCode]);
+
+	const handleLogout = useCallback(event => {
+		setToken(null);
+	}, []);
+
+	window.addEventListener("beforeunload", handleLogout);
+
+	return (
+		<div className="app">
+			<main>
+				{token ? (
+					<Room socket={socket} roomCode={roomCode} token={token} handleLogout={handleLogout} />
+				):(
+					<Lobby
+						name={name}
+						roomCode={roomCode}
+						handleNameChange={handleNameChange}
+						handleRoomCodeChange={handleRoomCodeChange}
+						handleSubmit={handleSubmit}
+					/>
+				)}
+			</main>
+		</div>
+	)
 }
 
 export default App;
