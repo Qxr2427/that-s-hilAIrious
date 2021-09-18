@@ -1,0 +1,29 @@
+{
+  "name": "quiplash-video-react",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@vladmandic/face-api": "^1.1.5",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-scripts": "^3.4.0",
+    "socket.io-client": "^4.2.0",
+    "twilio-video": "^2.17.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "proxy": "http://localhost:5000/",
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
