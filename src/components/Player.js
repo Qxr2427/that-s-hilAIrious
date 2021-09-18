@@ -30,7 +30,7 @@ function runningavg(arr){
 			count--
 		}
 	}
-	if (count == 0) return avg
+	if (count === 0) return avg
 	return avg/count
 }
 

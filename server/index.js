@@ -71,7 +71,7 @@ io.on("connection", socket => {
 
 	socket.on('reveal-joke', () => {
 		io.emit('joke-revealed');
-
+		
 		setTimeout(() => {
 			io.emit('turn-finished');
 		}, 10000);

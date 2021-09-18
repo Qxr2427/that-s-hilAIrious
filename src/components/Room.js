@@ -18,6 +18,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 	const [players, setPlayers] = useState([]);
 	const [status, setStatus] = useState(statuses[0]);
 	const [yourTurn, setYourTurn] = useState(false);
+	const [name] = useState('');
 
 	const otherPlayers = players.map(p => <Player key={p.sid} player={p} socket={socket} />);
 
@@ -28,11 +29,16 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		});
 	}, [room]);
 
-	const handleSubmitJoke = useCallback(() => {
+	const handleSubmitJoke = useCallback((event) => {
+		//console.log(state);
+		event.preventDefault();
 		socket.emit('reveal-joke', {
 			playerSid: room.localParticipant.sid,
 			roomSid: room.sid,
+			//need to get the form data somehow
+		
 		});
+		return false;
 	}, [room]);
 
 	const handleNextTurn = useCallback(() => {
@@ -103,31 +109,15 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			{status === 'before-start' && <button onClick={handleStartGame}>Start Game</button>}
 			{(status === 'prompt' && yourTurn) && ( <div id ="test">
 			
-			<form onSubmit={handleSubmitJoke}>
-			<h1>Test app</h1>
+			<form id ="test" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
 			<input
 				type="text"
-				id="name"
-				placeholder="Name"
-			/>
-			<input
-				type="text"
-				id="roomCode"
-				value={roomCode}
-				maxLength={4}
-				placeholder="Code"
-				required
-			/>
-      	<button type="submit">Join</button>
-		</form>
-
-
-			<button onClick={handleSubmitJoke}>Submit prompt</button>
-
-
-
+				// id="n"
+				// name="n"
+				// placeholder="Name"
+			/>		
+			</form>
 			</div>
-			
 			)}
 			{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
       <button onClick={handleLogout}>Log out</button>
