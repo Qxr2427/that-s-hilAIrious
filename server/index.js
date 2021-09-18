@@ -69,9 +69,9 @@ io.on("connection", socket => {
 		io.to(order[roomInfo.curIndex]).emit('your-turn');
 	});
 
-	socket.on('reveal-joke', () => {
-		io.emit('joke-revealed');
-		
+	socket.on('reveal-joke', (data) => {
+		console.log("console joke",data.text);
+		io.emit('joke-revealed', {joke: data.text});
 		setTimeout(() => {
 			io.emit('turn-finished');
 		}, 10000);

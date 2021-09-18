@@ -13,12 +13,14 @@ const statuses = [
 	'game-end',
 ]
 
+var txt;
+
 const Room = ({ socket, roomCode, token, handleLogout }) => {
 	const [room, setRoom] = useState(null);
 	const [players, setPlayers] = useState([]);
 	const [status, setStatus] = useState(statuses[0]);
 	const [yourTurn, setYourTurn] = useState(false);
-	const [name] = useState('');
+	const [joke, setjoke] = useState('');
 
 	const otherPlayers = players.map(p => <Player key={p.sid} player={p} socket={socket} />);
 
@@ -29,17 +31,22 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		});
 	}, [room]);
 
+	const handleChange = event => {
+		setjoke(event.target.value)
+	  };
 	const handleSubmitJoke = useCallback((event) => {
 		//console.log(state);
 		event.preventDefault();
+		//console.log(name)
+		//alert(`${joke}`)
 		socket.emit('reveal-joke', {
 			playerSid: room.localParticipant.sid,
 			roomSid: room.sid,
+			text: joke
 			//need to get the form data somehow
-		
 		});
 		return false;
-	}, [room]);
+	}, [room, joke]);
 
 	const handleNextTurn = useCallback(() => {
 		socket.emit('next-turn', {
@@ -75,8 +82,12 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				setStatus(statuses[2]);
 				setYourTurn(false);
 			});
-			socket.on('joke-revealed', () => {
+			socket.on('joke-revealed', ({joke}) => {
 				setStatus(statuses[4]);
+				console.log(joke);
+				setjoke(joke)
+				  //this is received
+				//joke is undefined here
 			})
 			socket.on('turn-finished', () => {
 				setStatus(statuses[5]);
@@ -106,20 +117,24 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			<h2>Room: {roomCode}</h2>
 			<p>{status}</p>
 			<p>Your turn? {`${yourTurn}`}</p>
+			<p>CURRENT JOKE? {`${joke}`}</p>
 			{status === 'before-start' && <button onClick={handleStartGame}>Start Game</button>}
 			{(status === 'prompt' && yourTurn) && ( <div id ="test">
 			
 			<form id ="test" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
 			<input
 				type="text"
-				// id="n"
-				// name="n"
+				id="joke"
+				name="joke"
 				// placeholder="Name"
+				onChange={handleChange}
+				value={joke}
 			/>		
 			</form>
 			</div>
 			)}
 			{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
+			{(status === 'reveal') && <h1>{`${joke}`}</h1>}
       <button onClick={handleLogout}>Log out</button>
       <div className="this-player">
         {room ? (
