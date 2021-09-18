@@ -59,6 +59,8 @@ const Player = ({ isLocalParticipant, player, socket }) => {
     setInterval(async () => {
       const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
 
+			if (!detections[0])	return;
+
       let diffX = Math.abs(prevX - detections[0].detection._box.x )
       let diffY = Math.abs(prevY - detections[0].detection._box.y )
       prevX = detections[0].detection._box.x
@@ -67,15 +69,16 @@ const Player = ({ isLocalParticipant, player, socket }) => {
       let mouth = detections[0].landmarks.positions[57].y - detections[0].landmarks.positions[51].y
 
       console.log(happy)
-      console.log(diffX)
-      console.log(diffY)
-      console.log(mouth - referenceMouth)
-      console.log(referenceMouth)
+      // console.log(diffX)
+      // console.log(diffY)
+      // console.log(mouth - referenceMouth)
+      // console.log(referenceMouth)
       if(!flag){
         referenceMouth = mouth - 8
         flag=true
       }
       var cur_score = score(happy, (mouth - referenceMouth) * 0.042, diffX, diffY)
+			// console.log(cur_score);
       
       running_average_array.shift()
       running_average_array.push(cur_score)
