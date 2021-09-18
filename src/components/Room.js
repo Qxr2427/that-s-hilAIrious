@@ -95,7 +95,34 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			<p>{status}</p>
 			<p>Your turn? {`${yourTurn}`}</p>
 			{status === 'before-start' && <button onClick={handleStartGame}>Start Game</button>}
-			{(status === 'prompt' && yourTurn) && <button onClick={handleSubmitJoke}>Submit prompt</button>}
+			{(status === 'prompt' && yourTurn) && ( <div id ="test">
+			
+			<form onSubmit={handleSubmitJoke}>
+			<h1>Test app</h1>
+			<input
+				type="text"
+				id="name"
+				placeholder="Name"
+			/>
+			<input
+				type="text"
+				id="roomCode"
+				value={roomCode}
+				maxLength={4}
+				placeholder="Code"
+				required
+			/>
+      	<button type="submit">Join</button>
+		</form>
+
+
+			<button onClick={handleSubmitJoke}>Submit prompt</button>
+
+
+
+			</div>
+			
+			)}
 			{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
       <button onClick={handleLogout}>Log out</button>
       <div className="this-player">
