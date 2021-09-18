@@ -64,7 +64,8 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			roomSid: room.sid,
 			num_turns: numturns - 1
 		});
-	}, [room]);
+		console.log("minus one ",numturns-1)
+	}, [room,numturns]);
 
 	useEffect(() => {
 		const playerJoined = player => setPlayers(prev => [...prev, player]);
@@ -89,7 +90,8 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				//choose prompt
 				setprompt(prompts[prompt_num]);
 				socket.emit('prompt', {prompt: prompts[prompt_num]});
-				setnumturns(prompt_num);
+				socket.emit('update_num_turns',{num_turns: prompt_num});
+				//setnumturns(prompt_num);
 				setYourTurn(true);
 				setStatus(statuses[2]);
 				socket.emit('my-turn', { playerSid: room.localParticipant.sid });
@@ -98,8 +100,12 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				setStatus(statuses[2]);
 				setYourTurn(false);
 			});
-			socket.on('update-prompt', ({prompt})=>{
+			socket.on('update_prompt', ({prompt})=>{
 				setprompt(prompt);
+				//console.log(prompt);
+			})
+			socket.on('UPDATE_NUM_TURNS', ({num_turns})=>{
+				setnumturns(num_turns);
 			})
 			socket.on('joke-revealed', ({joke}) => {
 				setStatus(statuses[4]);
