@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Lobby from './components/Lobby'
 import Room from './components/Room'
 import { io } from 'socket.io-client';
-import './App.css';
+// import './App.css';
 
 const socket = io('/');
 

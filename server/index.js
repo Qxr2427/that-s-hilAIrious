@@ -12,6 +12,8 @@ const twilioClient = new twilio(
 	{ accountSid: config.twilio.accountSid },
 );
 
+const games = {};
+
 const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
@@ -46,15 +48,46 @@ app.post('/token', (req, res) => {
 })
 
 io.on("connection", socket => {
-	socket.on('start-game', async ({ playerSid, roomSid }) => {
-		const scores = {};
-		console.log(twilioClient.video.rooms(roomSid).participants);
-		const room = await twilioClient.video.rooms(roomSid).fetch();
-		const participants = await room.participants.fetch();
-		console.log(room);
-		// const startingPlayer = room.participants;
-		// Send info back to all users
-		//
+	socket.on('start-game', ({ playerSid, roomSid }) => {
+		const order = [...io.sockets.sockets.keys()];
+		console.log(order);
+		order.splice(order.indexOf(socket.id), 1);
+		order.unshift(socket.id);
+
+		console.log(order);
+
+		const roomInfo = {};
+
+		roomInfo.order = order;
+		roomInfo.curIndex = 0;
+		roomInfo.scores = {};
+		roomInfo.order.forEach(id => roomInfo.scores[id] = 0);
+
+		games[roomSid] = roomInfo;
+		io.emit('game-started');
+		io.to(order[roomInfo.curIndex]).emit('your-turn');
+	});
+
+	socket.on('reveal-joke', () => {
+		io.emit('joke-revealed');
+
+		setTimeout(() => {
+			io.emit('turn-finished');
+		}, 10000);
+	})
+
+	socket.on('next-turn', ({ playerSid, roomSid }) => {
+		games[roomSid].curIndex++;
+		if (games[roomSid].curIndex >= games[roomSid].order.length) {
+			io.emit('game-ended')
+			return;
+		}
+
+		io.to(games[roomSid].order[games[roomSid].curIndex]).emit('your-turn');
+	})
+
+	socket.on('my-turn', ({ playerSid }) => {
+		socket.broadcast.emit('others-turn', { otherSid: playerSid });
 	})
 });
 
