@@ -70,7 +70,12 @@ io.on("connection", socket => {
 		roomInfo.order = order;
 		roomInfo.curIndex = 0;
 		roomInfo.scores = {};
-		roomInfo.order.forEach(id => roomInfo.scores[id] = 0);
+		roomInfo.order.forEach(id => roomInfo.scores[id] = {
+			max10Score: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			totalScore: 0,
+			totalCount: 0,
+			finalScore: 0
+		});
 
 		games[roomSid] = roomInfo;
 		io.emit('game-started');
@@ -85,6 +90,14 @@ io.on("connection", socket => {
 		setTimeout(() => {
 			io.emit('turn-finished');
 		}, 10000);
+	})
+	socket.on('process_score', (data) => {
+		let cur_score = data.cur_score;
+		games[roomSid].scores.totalScore += cur_score;
+		scores.totalCount += 1;
+		scores.max10Score.push(cur_score);
+		scores.max10Score.sort(function (a, b) {  return a - b;  });
+		scores.max10Score = max10Score.slice(1);
 	})
 	socket.on('prompt', ({prompt})=>{
 		io.emit('update_prompt', {prompt: prompt})

@@ -39,8 +39,8 @@ const Player = ({ isLocalParticipant, player, socket }) => {
         flag = true
       }
       cur_score = calculateScore(detections[0].expressions, (mouth_size - reference_size) * 0.05, diffX, diffY)
-      socket.emit('cur_score', {current_score: cur_score})
-    }, 500)
+      socket.emit('process_score', {current_score: cur_score})
+    }, 1000)
 	})
 
   useEffect(() => {
