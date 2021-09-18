@@ -1,92 +1,46 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as faceapi from '@vladmandic/face-api';
 
-function score(happy, surprised, diffX, diffY){
-	let diffScore = 20
-	if((diffX + diffY)/20 > 1){
-		diffScore = 1
-	}
-	else{
-		diffScore = (diffX + diffY)/20 
-	}
-	let surprisedScore = 20 
-	if(surprised > 1){
-		surprisedScore = 1
-	}
-	else{
-		surprisedScore = surprised
-	}
-	return 100*(happy*0.5 + surprisedScore*0.4 + diffScore * 0.1)
-}
-
-function runningavg(arr){
-	let avg = 0
-	let count = arr.length
-	var i 
-	for (i = 0; i < arr.length; i++){
-		try {
-			avg += arr[i]
-		} catch (error) {
-			count--
-		}
-	}
-	if (count === 0) return avg
-	return avg/count
+function calculateScore(expressions, mouth_opening, diffX, diffY){
+  let body_mvmt = (diffX + diffY) / 20 > 1 ? 1 : (diffX + diffY) / 20
+  let laugh_score = mouth_opening > 1 ? 1 : mouth_opening
+  let other_expressions = expressions.surprised * 0.2 - expressions.angry * 0.5 - expressions.disgusted * 0.5 - expressions.fearful * 0.3 - expressions.sad * 0.8;
+  return 100 * (expressions.happy * 0.5 + laugh_score * 0.4 + body_mvmt * 0.1 + other_expressions)
 }
 
 const Player = ({ isLocalParticipant, player, socket }) => {
   const [videoTracks, setVideoTracks] = useState([]);
   const [audioTracks, setAudioTracks] = useState([]);
-
   const videoRef = useRef();
   const audioRef = useRef();
-
+  
   const trackpubsToTracks = (trackMap) =>
     Array.from(trackMap.values())
       .map((publication) => publication.track)
       .filter((track) => track !== null);
-
 	useEffect(() => {
 		if (!isLocalParticipant) return;
 
 		var prevX = 100
     var prevY = 100
-    var running_average_array = [60, 60, 60, 60, 60]
+    let reference_size = 0
+    let cur_score;
     let flag = false
-    let maxscore = 60
-    let referenceMouth = 0
-    let cur_average
     setInterval(async () => {
       const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
-
-			if (!detections[0])	return;
-
+      if (!detections[0]) return;
       let diffX = Math.abs(prevX - detections[0].detection._box.x )
       let diffY = Math.abs(prevY - detections[0].detection._box.y )
       prevX = detections[0].detection._box.x
       prevY = detections[0].detection._box.y
-      let happy = detections[0].expressions.happy
-      let mouth = detections[0].landmarks.positions[57].y - detections[0].landmarks.positions[51].y
-
-      console.log(happy)
-      // console.log(diffX)
-      // console.log(diffY)
-      // console.log(mouth - referenceMouth)
-      // console.log(referenceMouth)
-      if(!flag){
-        referenceMouth = mouth - 8
-        flag=true
+      let mouth_size = detections[0].landmarks.positions[57].y - detections[0].landmarks.positions[51].y
+      if (!flag) {
+        reference_size = mouth_size - 8
+        flag = true
       }
-      var cur_score = score(happy, (mouth - referenceMouth) * 0.042, diffX, diffY)
-			// console.log(cur_score);
-      
-      running_average_array.shift()
-      running_average_array.push(cur_score)
-      cur_average = runningavg(running_average_array)
-      maxscore = Math.max (cur_average, maxscore)
-
-      socket.emit('cur_score', {current_score: cur_average})
-		}, 500);
+      cur_score = calculateScore(detections[0].expressions, (mouth_size - reference_size) * 0.05, diffX, diffY)
+      socket.emit('cur_score', {current_score: cur_score})
+    }, 500)
 	})
 
   useEffect(() => {
@@ -138,7 +92,6 @@ const Player = ({ isLocalParticipant, player, socket }) => {
       };
     }
   }, [audioTracks]);
-
   return (
     <div className="player">
       <video ref={videoRef} autoPlay={true} style={{ transform: isLocalParticipant ? 'rotateY(180deg)' : '' }}/>
