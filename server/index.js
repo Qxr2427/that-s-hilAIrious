@@ -48,7 +48,6 @@ const videoTokenFor = (identity, room) => {
 app.post('/token', (req, res) => {
 	const token = videoTokenFor(req.body.name, req.body.roomCode);
 	res.set('Content-Type', 'application/json');
-	console.log(token);
 	res.send(JSON.stringify({ token: token.toJwt() }))
 })
 
@@ -83,7 +82,11 @@ io.on("connection", socket => {
 		console.log("console joke",data.text);
 		io.emit('joke-revealed', {joke: data.text});
 		setTimeout(() => {
-			io.emit('turn-finished');
+			if (games[data.roomSid].curIndex >= games[data.roomSid].order.length - 1) {
+				io.emit('game-ended')
+			} else {
+				io.emit('turn-finished');
+			}
 		}, 10000);
 	})
 	socket.on('prompt', ({prompt})=>{
@@ -96,10 +99,6 @@ io.on("connection", socket => {
 	})
 	socket.on('next-turn', ({ playerSid, roomSid, num_turns }) => {
 		games[roomSid].curIndex++;
-		if (games[roomSid].curIndex >= games[roomSid].order.length) {
-			io.emit('game-ended')
-			return;
-		}
 
 		io.to(games[roomSid].order[games[roomSid].curIndex]).emit('your-turn', {prompt_num: num_turns});
 	})

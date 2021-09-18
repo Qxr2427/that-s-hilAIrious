@@ -77,7 +77,7 @@ video {
 #main {
 	height: 100%;
 	margin-left: 200px;
-	padding: 30px;
+	padding: 50px;
 }
 
 .player + .player {
@@ -93,4 +93,12 @@ video {
 }
 .prompt {
   text-align: center;
+}
+
+.vertical-center {
+	margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
 }
