@@ -16,10 +16,10 @@ const statuses = [
 var txt;
 
 const prompts = [
-	'prompt 1',
-	'prompt 2',
-	'prompt 3',
-	'prompt 4'
+	'The reason flamingos stand on one leg.',
+	'The worst thing to say or do after someone farts.',
+	'People who like this thing are the scum of the Earth.',
+	'The name of the man who invented urinals.'
 ]
 
 
@@ -116,6 +116,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			})
 			socket.on('turn-finished', () => {
 				setStatus(statuses[5]);
+				setjoke('');
 			})
 			socket.on('game-ended', () => {
 				setStatus(statuses[6]);
@@ -153,28 +154,29 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 					)}
 					{otherPlayers}
 				</div>
-				<button onClick={handleLogout} style={{position: "absolute", bottom: 0}}>Log out</button>
+				<button onClick={handleLogout} style={{position: "absolute", bottom: '15px', justifyContent: 'center'}}>Exit game</button>
 			</div>
 			<div id="main">
-				<h2>Room: {roomCode}</h2>
-				{status === 'before-start' && <button onClick={handleStartGame}>Start Game</button>}
-				{(status === 'prompt') && <h1>{`${prompt}`}</h1>/*display prompt for everyone*/ }
-				{(status === 'prompt' && yourTurn) && ( 
-					<div id ="test">
-						<form id ="test" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
-							<input
-								type="text"
-								id="joke"
-								name="joke"
-								// placeholder="Name"
-								onChange={handleChange}
-								value={joke}
-							/>		
-						</form>
-					</div>
-				)}
-				{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
-				{(status === 'reveal') && <h1>{`${joke}`}</h1>}
+				<div class="vertical-center">
+					{status === 'before-start' && <BeforeStart roomCode={roomCode} handleStartGame={handleStartGame} />}
+					{(status === 'prompt') && <h1>{`${prompt}`}</h1>/*display prompt for everyone*/ }
+					{(status === 'prompt' && yourTurn) && ( 
+						<div id ="test">
+							<form id ="test" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
+								<input
+									type="text"
+									id="joke"
+									name="joke"
+									// placeholder="Name"
+									onChange={handleChange}
+									value={joke}
+								/>		
+							</form>
+						</div>
+					)}
+					{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
+					{(status === 'reveal') && <h1>{`${joke}`}</h1>}
+				</div>
 			</div>
 			<div id="dev-stats">
 				<p>{status}</p>
@@ -184,5 +186,15 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		</div>
 	)
 };
+
+const BeforeStart = ({ roomCode, handleStartGame }) => {
+	return (
+		<div id="before-start">
+			<p style={{ fontSize: "30px", color: "white" }}>To join, go to htn2021.game.com and enter the code:</p>
+			<h1>{roomCode}</h1>
+			<button onClick={handleStartGame}>Start Game</button>
+		</div>
+	);
+}
 
 export default Room;

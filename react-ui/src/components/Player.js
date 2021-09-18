@@ -26,7 +26,7 @@ const Player = ({ isLocalParticipant, player, socket }) => {
     let reference_size = 0
     let cur_score;
     let flag = false
-    setInterval(async () => {
+    const scoreInterval = setInterval(async () => {
       const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
       if (!detections[0]) return;
       let diffX = Math.abs(prevX - detections[0].detection._box.x )
@@ -40,7 +40,11 @@ const Player = ({ isLocalParticipant, player, socket }) => {
       }
       cur_score = calculateScore(detections[0].expressions, (mouth_size - reference_size) * 0.05, diffX, diffY)
       socket.emit('cur_score', {current_score: cur_score})
-    }, 500)
+    }, 500);
+
+		return () => {
+			clearInterval(scoreInterval);
+		}
 	})
 
   useEffect(() => {
