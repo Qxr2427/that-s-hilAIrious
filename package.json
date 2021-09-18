@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "node server",
+    "devStart": "nodemon server",
     "build": "cd react-ui/ && npm install && npm run build"
   },
   "eslintConfig": {

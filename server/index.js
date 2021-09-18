@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const pino = require('express-pino-logger')();
+const path = require('path');
 
 const twilio = require('twilio');
 const AccessToken = twilio.jwt.AccessToken;
@@ -21,6 +22,7 @@ const io = require("socket.io")(server);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static('public'));
+app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 app.use(pino);
 
 const videoTokenFor = (identity, room) => {
@@ -47,6 +49,10 @@ app.post('/token', (req, res) => {
 	console.log(token);
 	res.send(JSON.stringify({ token: token.toJwt() }))
 })
+
+app.get('*', function(request, response) {
+	response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
+});
 
 io.on("connection", socket => {
 	socket.on('start-game', ({ playerSid, roomSid }) => {
