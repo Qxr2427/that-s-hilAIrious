@@ -114,42 +114,47 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 
 	return(
 		<div className="room">
-			<h2>Room: {roomCode}</h2>
-			<p>{status}</p>
-			<p>Your turn? {`${yourTurn}`}</p>
-			<p>CURRENT JOKE? {`${joke}`}</p>
-			{status === 'before-start' && <button onClick={handleStartGame}>Start Game</button>}
-			{(status === 'prompt' && yourTurn) && ( <div id ="test">
-			
-			<form id ="test" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
-			<input
-				type="text"
-				id="joke"
-				name="joke"
-				// placeholder="Name"
-				onChange={handleChange}
-				value={joke}
-			/>		
-			</form>
+			<div id="sidebar">
+				<div className="videos">
+					{room ? (
+						<Player
+							isLocalParticipant={true}
+							key={room.localParticipant.sid}
+							player={room.localParticipant}
+							socket={socket}
+						/>
+					) : (
+						''
+					)}
+					{otherPlayers}
+				</div>
+				<button onClick={handleLogout} style={{position: "absolute", bottom: 0}}>Log out</button>
 			</div>
-			)}
-			{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
-			{(status === 'reveal') && <h1>{`${joke}`}</h1>}
-      <button onClick={handleLogout}>Log out</button>
-      <div className="this-player">
-        {room ? (
-					<Player
-						isLocalParticipant={true}
-            key={room.localParticipant.sid}
-            player={room.localParticipant}
-						socket={socket}
-          />
-        ) : (
-          ''
-        )}
-      </div>
-      <h3>Remote Participants</h3>
-      <div className="remote-participants">{otherPlayers}</div>
+			<div id="main">
+				<h2>Room: {roomCode}</h2>
+				{status === 'before-start' && <button onClick={handleStartGame}>Start Game</button>}
+				{(status === 'prompt' && yourTurn) && ( 
+					<div id ="test">
+						<form id ="test" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
+							<input
+								type="text"
+								id="joke"
+								name="joke"
+								// placeholder="Name"
+								onChange={handleChange}
+								value={joke}
+							/>		
+						</form>
+					</div>
+				)}
+				{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
+				{(status === 'reveal') && <h1>{`${joke}`}</h1>}
+			</div>
+			<div id="dev-stats">
+				<p>{status}</p>
+				<p>Your turn? {`${yourTurn}`}</p>
+				<p>CURRENT JOKE? {`${joke}`}</p>
+			</div>
 		</div>
 	)
 };

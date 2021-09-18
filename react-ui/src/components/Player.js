@@ -141,9 +141,9 @@ const Player = ({ isLocalParticipant, player, socket }) => {
 
   return (
     <div className="player">
-      <h3>{player.identity}</h3>
-      <video ref={videoRef} autoPlay={true} />
+      <video ref={videoRef} autoPlay={true} style={{ transform: isLocalParticipant ? 'rotateY(180deg)' : '' }}/>
       <audio ref={audioRef} autoPlay={true} />
+      <p style={{textAlign: 'center'}}>{player.identity}{isLocalParticipant && " (you)"}</p>
     </div>
   );
 };
