@@ -107,7 +107,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				socket.emit('my-turn', { playerSid: room.localParticipant.sid });
 			});
 			socket.on('others-turn', ({ otherSid }) => {
-				setStatus(statuses[3]);
+				setStatus(statuses[2]); // this should be prompt
 				setYourTurn(false);
 			});
 			socket.on('update_prompt', ({prompt})=>{
