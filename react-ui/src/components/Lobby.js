@@ -1,4 +1,5 @@
 import React from 'react';
+import Anime, { anime } from 'react-anime';
 
 const Lobby = ({
 	name,
@@ -9,6 +10,9 @@ const Lobby = ({
 }) => {
 	return (
 		<div id="lobby-form">
+			{/* <Anime transformX={50}>
+			<img src="emoji_laugh.png"></img>
+			</Anime> */}
 			<form onSubmit={handleSubmit}>
 				<h1>QUIPLASH</h1>
 				<input
