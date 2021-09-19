@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import Video from 'twilio-video';
 import Player from './Player';
 import Anime, { anime } from 'react-anime';
+import "../App.css"
 
 let colors = [ 'blue', 'green', 'red' ];
 
@@ -13,9 +15,10 @@ const statuses = [
 	'reveal',
 	'turn-end',
 	'game-end',
+	'standings',
 ]
 
-var txt;
+var curID;
 
 const prompts = [
 	'The reason flamingos stand on one leg.',
@@ -33,9 +36,11 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 	const [joke, setjoke] = useState('');
 	const [prompt, setprompt] = useState('');
 	const [numturns, setnumturns] = useState(0);
+	const [curID, setCurID] = useState('');
 	const [Name, setName] = useState('');
 	const [Socketid, setSocketid] = useState('');
-	const otherPlayers = players.map(p => <Player key={p.sid} player={p} socket={socket} roomSid={room.sid} inGame={status === 'reveal'} status={status}/>);
+	const otherPlayers = players.map(p => <Player isLocalParticipant={false}
+		key={p.sid} player={p} socket={socket} roomSid={room.sid} inGame={status === 'reveal'} status={status} curID={curID} />);
 
 
 	const handleStartGame = useCallback(() => {
@@ -44,6 +49,8 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			roomSid: room.sid,
 		});
 	}, [room]);
+
+
 
 	const handleChange = event => {
 		setjoke(event.target.value)
@@ -71,7 +78,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		});
 		console.log("minus one ",numturns-1)
 	}, [room,numturns]);
-
+	
 	useEffect(() => {
 		const playerJoined = player => setPlayers(prev => [...prev, player]);
 		const playerLeft = player => setPlayers(prev => prev.filter(x => x !== player));
@@ -97,10 +104,11 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			socket.on('here_is_my_name', ({name, socketid})=>{
 				socket.emit('back_to_you', ({name: name, socketid: socketid}))
 			})
-			socket.on('your-turn', ({prompt_num}) => {
+			socket.on('your-turn', ({prompt_num, id}) => {
 				 //prompt status
 				//choose prompt
 				setprompt(prompts[prompt_num]);
+				setCurID(id);
 				socket.emit('prompt', {prompt: prompts[prompt_num]});
 				socket.emit('update_num_turns',{num_turns: prompt_num});
 				//setnumturns(prompt_num);
@@ -131,6 +139,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				setjoke('');
 			})
 			socket.on('game-ended', () => {
+				socket.emit("leaderboard")
 				setStatus(statuses[6]);
 			})
 		});
@@ -162,6 +171,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 							socket={socket}
 							roomSid={room.sid}
 							inGame={status === 'reveal'}
+							curID={curID}
 						/>
 					) : (
 						''
@@ -200,10 +210,18 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 					{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
 					{(status === 'reveal') && <h1>{`${joke}`}</h1>}
 					{(status === 'game-end') && (
-						<Anime translateY={150}>
-							<h1>GAME OVER!</h1>
-						</Anime>
+						<div>
+							<Anime translateY={150}>
+								<h1>GAME OVER!</h1>
+							</Anime>
+							<button onClick={() => {
+								setStatus(statuses[7])
+							}}>
+								Standings
+							</button>
+						</div>
 					)}
+					{(status === 'standings') && <Standings roomCode={room.sid} socket={socket} />}
 				</div>
 			</div>
 			<div id="dev-stats">
@@ -223,6 +241,56 @@ const BeforeStart = ({ roomCode, handleStartGame }) => {
 			<button onClick={handleStartGame}>Start Game</button>
 		</div>
 	);
+}
+
+const Standings = ({ roomCode, socket }) => {
+	const [scores, setScores] = useState([]);
+	const [players, setPlayers] = useState([]);
+	var scoreMap = [];
+	var col1 = [<h2>Standings</h2>];
+	var col2 = [<h2>Name</h2>];
+	var col3 = [<h2>Score</h2>]
+	const suffix = (n) => {
+		let a = n % 10;
+		let b = n % 100;
+		if (a == 1 && b != 11) return n + "st";
+		if (a == 2 && b != 12) return n + "nd";
+		if (a == 3 && b != 13) return n + "rd";
+		else return n + "th"
+	}
+
+	useEffect(() => {
+		socket.emit('show-standings', {roomSid: roomCode})
+		socket.on('standings', ({scores, players}) => {
+			console.log("Scores",scores);
+			console.log("Players",players);
+			setScores(scores);
+			setPlayers(players);
+		})
+	}, [])
+
+	const generateBoard = () => {
+		for (var id in scores) {
+			scoreMap[players[id]] = scores[id].finalScore ? scores[id].finalScore : 0
+		}
+		let l = Object.keys(scoreMap).length;
+		const sortedMap = Object.entries(scoreMap).sort((a, b)=> b[1] - a[1])
+		for (var i = 1; i <= l; ++i) {
+			col1.push(<h2>{suffix(i)}</h2>); 
+			col2.push(<h2>{sortedMap[i-1][0]}</h2>);
+			col3.push(<h2>{sortedMap[i-1][1]}</h2>);
+		}
+		return;
+	}
+	generateBoard();
+
+	return ( 
+		<div id="game-end" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridGap: 20 }}>
+			<div>{col1}</div>
+			<div>{col2}</div>
+			<div>{col3}</div>
+		</div>
+	)
 }
 
 export default Room;

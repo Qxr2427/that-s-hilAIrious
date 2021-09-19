@@ -95,7 +95,7 @@ io.on("connection", socket => {
 		io.emit('game-started');
 		number_turns = order.length;
 		console.log(number_turns)
-		io.to(order[roomInfo.curIndex]).emit('your-turn', {prompt_num: number_turns});
+		io.to(order[roomInfo.curIndex]).emit('your-turn', {prompt_num: number_turns, id: order[roomInfo.curIndex]});
 	});
 	
 	//id is undefined here
@@ -110,13 +110,16 @@ io.on("connection", socket => {
 				let max_scores_avg = scores.maxScores.reduce((pv, cv) => pv + cv, 0) / scores.maxScores.length
 				scores.finalScore = scores.totalScore / scores.totalCount * 0.25 + max_scores_avg * 0.75
 				//game over condition
-				io.emit('score_update', {scores: games[data.roomSid].scores, players: players});
+				io.emit('score_update', {scores: games[data.roomSid].scores, players: players, prev: prev_speaker});
 				console.log(scores)
-				io.emit('game-ended')
+				io.emit('game-ended', {scores: games[data.roomSid].scores, players: players})
 			} else {
 				io.emit('turn-finished');
 			}
-		}, 10000);
+		}, 50);
+	})
+	socket.on('show-standings',(data) => {
+		socket.emit('standings', {scores: games[data.roomSid].scores, players: players})
 	})
 	socket.on('process_score', (data) => {
 		console.log("received score: ")
@@ -149,10 +152,10 @@ io.on("connection", socket => {
 		let scores = games[roomSid].scores[prev_speaker]
 		let max_scores_avg = scores.maxScores.reduce((pv, cv) => pv + cv, 0) / scores.maxScores.length
 		scores.finalScore = scores.totalScore / scores.totalCount * 0.25 + max_scores_avg * 0.75
-		io.emit('score_update', {scores: games[roomSid].scores, players: players});
+		io.emit('score_update', {scores: games[roomSid].scores, players: players, prev: prev_speaker});
 		//console.log(scores)
 		games[roomSid].curIndex++;
-		io.to(games[roomSid].order[games[roomSid].curIndex]).emit('your-turn', {prompt_num: num_turns});
+		io.to(games[roomSid].order[games[roomSid].curIndex]).emit('your-turn', {prompt_num: num_turns, id: games[roomSid].order[games[roomSid].curIndex]});
 		
 	})
 

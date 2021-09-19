@@ -7,7 +7,7 @@ function calculateScore(expressions, mouth_opening, diffX, diffY){
   let other_expressions = expressions.surprised * 0.2 - expressions.angry * 0.5 - expressions.disgusted * 0.5 - expressions.fearful * 0.3 - expressions.sad * 0.8;
   return 100 * (expressions.happy * 0.5 + laugh_score * 0.4 + body_mvmt * 0.1 + other_expressions)
 }
-const Player = ({ isLocalParticipant, player, socket, roomSid, inGame }) => {
+const Player = ({ isLocalParticipant, player, socket, roomSid, inGame, curID }) => {
   const [videoTracks, setVideoTracks] = useState([]);
   const [audioTracks, setAudioTracks] = useState([]);
   const videoRef = useRef();
@@ -41,11 +41,15 @@ const Player = ({ isLocalParticipant, player, socket, roomSid, inGame }) => {
         }
         cur_score = calculateScore(detections[0].expressions, (mouth_size - reference_size) * 0.05, diffX, diffY)
         socket.emit('process_score', {cur_score: cur_score, roomSid: roomSid})
-        console.log("Sent")
         socket.on('turn-finished', () => clearInterval(interval))
         socket.on('game-ended', () => clearInterval(interval))
+        socket.on('standings', () => clearInterval(interval))
       }, 1000)
     }
+    socket.on('turn-finished', () => clearInterval(interval))
+    socket.on('game-ended', () => clearInterval(interval))
+    socket.on('standings', () => clearInterval(interval))
+
 	})
 
   useEffect(() => {
@@ -97,19 +101,20 @@ const Player = ({ isLocalParticipant, player, socket, roomSid, inGame }) => {
       };
     }
   }, [audioTracks]);
-
+  
   useEffect(()=>{
-    socket.on('score_update', ({scores, players})=>{
+    socket.on('score_update', ({scores, players, prev})=>{
       //console.log("score update",scores[socket.id].finalScore);
       //console.log("once", scores);
       //console.log(socket.id);  //executes multiple times
-      console.log(scores);
-      for (var id in players) {
-        if (players[id] === player.identity){
-          setscore(scores[id].finalScore ? scores[id].finalScore : 50.32)
-          break
-        }
-      }
+      console.log("Scores:", scores);
+      console.log("Players:", players);
+      console.log("Player:", player)
+      console.log(curID)
+
+        if (players[prev] === player.identity){
+          setscore(scores[prev].finalScore)  
+    }
     });
     //[socket.id]
   }, []);
