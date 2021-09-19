@@ -218,10 +218,8 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 							</form>
 						</div>
 					)}
-					{(status === 'turn-end') && (
-						<button onClick={handleNextTurn}>Next turn</button>
-					)}
-					{(status === 'reveal') && <h1>{`${joke}`}</h1>}
+					{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
+					{(status === 'reveal') && <div><h1>{`${prompt}`}</h1><h1>{`${joke}`}</h1></div>}
 					{(status === 'game-end') && (
 						<div>
 							<Anime translateY={150}>

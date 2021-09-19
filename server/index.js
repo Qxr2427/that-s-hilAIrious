@@ -103,6 +103,12 @@ io.on("connection", socket => {
 	socket.on('reveal-joke', (data) => {
 		console.log("console joke",data.text);
 		io.emit('joke-revealed', {joke: data.text});
+		setTimeout(()=>{
+			let prev_speaker = games[data.roomSid].order[games[data.roomSid].curIndex]
+			let scores = games[data.roomSid].scores[prev_speaker]
+			let max_scores_avg = scores.maxScores.reduce((pv, cv) => pv + cv, 0) / scores.maxScores.length
+			io.emit('progress_check', {players: players, prev: prev_speaker, max_scores: max_scores_avg});	
+		},3000) //
 		setTimeout(() => {
 			if (games[data.roomSid].curIndex >= games[data.roomSid].order.length - 1) {
 				let prev_speaker = games[data.roomSid].order[games[data.roomSid].curIndex]

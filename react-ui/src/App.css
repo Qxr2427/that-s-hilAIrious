@@ -7,8 +7,10 @@
 
 html {
   height: 100%;
-	background: radial-gradient(circle, rgba(2,0,36,1) 0%, rgba(14, 96, 107,1) 48%, rgba(22, 151, 166,1) 100%);
-
+  background-image: url("./components/background.png"), radial-gradient(circle, rgba(2,0,36,1) 0%, rgba(14, 96, 107,1) 48%, rgba(22, 151, 166,1) 100%);
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.5;
 }
 
 .room {
@@ -122,10 +124,21 @@ video {
 
 #player-video {
 	border: 10px solid;
-
+	border-color: #1A759F;
 }
 h5 { 
 	color: #34A0A4;
 	font-size: medium;
 	text-align: center;
+}
+h6 {
+	text-align: center;
+	color: #184e77;
+	font-size: large;
+}
+#overlay { 
+	position: absolute;
+	z-index: 100;
+	color:rgba(14, 96, 107,1);
+	padding-top: 3ch;
 }
