@@ -288,12 +288,13 @@ const Standings = ({ roomCode, socket }) => {
 		}
 		let l = Object.keys(scoreMap).length;
 		const sortedMap = Object.entries(scoreMap).sort((a, b)=> b[1] - a[1])
-		for (var i = 1; i <= l; ++i) {
+		var rank = 0;
+		for (var i = 1; i <= l; i++) {
 			if (sortedMap[i-1][0] == undefined) {
-				--i;
 				continue;
 			}
-			col1.push(<h2>{suffix(i)}</h2>);
+			rank++;
+			col1.push(<h2>{suffix(rank)}</h2>);
 			col2.push(<h2>{sortedMap[i-1][0]}</h2>);
 			col3.push(<h2>{Math.floor(sortedMap[i-1][1])}</h2>);
 		}
