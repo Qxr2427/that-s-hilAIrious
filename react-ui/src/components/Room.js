@@ -289,7 +289,7 @@ const Standings = ({ roomCode, socket }) => {
 		for (var i = 1; i <= l; ++i) {
 			col1.push(<h2>{suffix(i)}</h2>); 
 			col2.push(<h2>{sortedMap[i-1][0]}</h2>);
-			col3.push(<h2>{sortedMap[i-1][1]}</h2>);
+			col3.push(<h2>{(sortedMap[i-1][1] * 100) % 100}</h2>);
 		}
 		return;
 	}

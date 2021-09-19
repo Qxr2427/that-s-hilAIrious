@@ -79,6 +79,7 @@ io.on("connection", socket => {
 		order.splice(order.indexOf(socket.id), 1);
 		order.unshift(socket.id);
 
+		console.log(order)
 		const roomInfo = {};
 
 		roomInfo.order = order;
