@@ -71,20 +71,13 @@ io.on("connection", socket => {
 	})
 	socket.on('back_to_you', ({name, socketid})=>{
 		players[socketid] = name;
-		//console.log("my name", players[socket.id], "my list", players)
 	})
 
 	socket.on('start-game', ({ playerSid, roomSid }) => {
 		console.log(id, socket.id);
-		
-
-
 		const order = [...io.sockets.sockets.keys()];
-		//console.log(order);
 		order.splice(order.indexOf(socket.id), 1);
 		order.unshift(socket.id);
-
-		//console.log(order);
 
 		const roomInfo = {};
 
@@ -117,6 +110,7 @@ io.on("connection", socket => {
 				let max_scores_avg = scores.maxScores.reduce((pv, cv) => pv + cv, 0) / scores.maxScores.length
 				scores.finalScore = scores.totalScore / scores.totalCount * 0.25 + max_scores_avg * 0.75
 				//game over condition
+				io.emit('score_update', {scores: games[data.roomSid].scores, players: players});
 				console.log(scores)
 				io.emit('game-ended')
 			} else {
@@ -155,7 +149,7 @@ io.on("connection", socket => {
 		let scores = games[roomSid].scores[prev_speaker]
 		let max_scores_avg = scores.maxScores.reduce((pv, cv) => pv + cv, 0) / scores.maxScores.length
 		scores.finalScore = scores.totalScore / scores.totalCount * 0.25 + max_scores_avg * 0.75
-		io.emit('score_update', {scores: games[roomSid].scores});
+		io.emit('score_update', {scores: games[roomSid].scores, players: players});
 		//console.log(scores)
 		games[roomSid].curIndex++;
 		io.to(games[roomSid].order[games[roomSid].curIndex]).emit('your-turn', {prompt_num: num_turns});

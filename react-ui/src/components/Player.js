@@ -99,14 +99,20 @@ const Player = ({ isLocalParticipant, player, socket, roomSid, inGame }) => {
   }, [audioTracks]);
 
   useEffect(()=>{
-    socket.on('score_update', ({scores})=>{
+    socket.on('score_update', ({scores, players})=>{
       //console.log("score update",scores[socket.id].finalScore);
       //console.log("once", scores);
       //console.log(socket.id);  //executes multiple times
-      setscore(scores[socket.id].finalScore)
+      console.log(scores);
+      for (var id in players) {
+        if (players[id] === player.identity){
+          setscore(scores[id].finalScore)
+          break
+        }
+      }
     });
     //[socket.id]
-  },[]);
+  }, []);
   return (
     <div className="player">
       <video ref={videoRef} autoPlay={true} style={{ transform: isLocalParticipant ? 'rotateY(180deg)' : '' }}/>
