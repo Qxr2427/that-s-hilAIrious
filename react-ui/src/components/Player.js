@@ -28,7 +28,7 @@ const Player = ({ isLocalParticipant, player, socket, roomSid, inGame }) => {
     var interval
     if (inGame) {
       interval = setInterval(async () => {
-        const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
+        const detections = await window.faceapi.detectAllFaces(videoRef.current, new window.faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
         if (!detections[0]) return;
         let diffX = Math.abs(prevX - detections[0].detection._box.x )
         let diffY = Math.abs(prevY - detections[0].detection._box.y )
