@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Video from 'twilio-video';
 import Player from './Player';
-import * as faceapi from '@vladmandic/face-api';
 import Anime, { anime } from 'react-anime';
 
 let colors = [ 'blue', 'green', 'red' ];
@@ -78,10 +77,10 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		const playerLeft = player => setPlayers(prev => prev.filter(x => x !== player));
 
 		Video.connect(token, { name: roomCode }).then(async room => {
-			await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-			await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-			await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-			await faceapi.nets.faceExpressionNet.loadFromUri('/models');
+			await window.faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+			await window.faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+			await window.faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+			await window.faceapi.nets.faceExpressionNet.loadFromUri('/models');
 
 			setRoom(room);
 			room.on('participantConnected', playerJoined);
