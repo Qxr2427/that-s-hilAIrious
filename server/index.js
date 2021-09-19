@@ -79,6 +79,7 @@ io.on("connection", socket => {
 		order.splice(order.indexOf(socket.id), 1);
 		order.unshift(socket.id);
 
+		console.log(order)
 		const roomInfo = {};
 
 		roomInfo.order = order;
@@ -93,7 +94,7 @@ io.on("connection", socket => {
 
 		games[roomSid] = roomInfo;
 		io.emit('game-started');
-		number_turns = order.length;
+		var number_turns = order.length;
 		console.log(number_turns)
 		io.to(order[roomInfo.curIndex]).emit('your-turn', {prompt_num: number_turns, id: order[roomInfo.curIndex]});
 	});
@@ -107,7 +108,7 @@ io.on("connection", socket => {
 			let prev_speaker = games[data.roomSid].order[games[data.roomSid].curIndex]
 			let scores = games[data.roomSid].scores[prev_speaker]
 			let max_scores_avg = scores.maxScores.reduce((pv, cv) => pv + cv, 0) / scores.maxScores.length
-			io.emit('progress_check', {players: players, prev: prev_speaker, max_scores: max_scores_avg});	
+			io.emit('progress_check', {players: players, prev: prev_speaker, max_scores: max_scores_avg});
 		},3000) //
 		setTimeout(() => {
 			if (games[data.roomSid].curIndex >= games[data.roomSid].order.length - 1) {
