@@ -94,7 +94,7 @@ io.on("connection", socket => {
 
 		games[roomSid] = roomInfo;
 		io.emit('game-started');
-		number_turns = order.length;
+		var number_turns = order.length;
 		console.log(number_turns)
 		io.to(order[roomInfo.curIndex]).emit('your-turn', {prompt_num: number_turns, id: order[roomInfo.curIndex]});
 	});
