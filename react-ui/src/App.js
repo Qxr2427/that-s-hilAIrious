@@ -16,6 +16,7 @@ const App = () => {
 
 	const handleSubmit = useCallback(async event => {
 		event.preventDefault();
+		socket.emit('my_name', {name: name, socketid: socket.id})
 		const data = await fetch('/token', {
 			method: 'POST',
 			body: JSON.stringify({

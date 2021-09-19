@@ -27,6 +27,8 @@ app.use(express.static('public'));
 app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 app.use(pino);
 
+var id;
+
 const videoTokenFor = (identity, room) => {
 	let videoGrant;
   if (typeof room !== 'undefined') {
@@ -34,7 +36,8 @@ const videoTokenFor = (identity, room) => {
   } else {
     videoGrant = new VideoGrant();
   }
-	console.log(identity);
+	console.log("IDENTITY:", identity);
+	id = identity;
 	const token = new AccessToken(
 		config.twilio.accountSid,
 		config.twilio.apiKey,
@@ -55,14 +58,33 @@ app.get('*', function(request, response) {
 	response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
 });
 
+const players = {};
 io.on("connection", socket => {
+	socket.on('my_name', ({name, socketid})=>{
+		//io.to(socket.id).emit('save_name', {name:name, socketid: socket.id})
+		//console.log('sent name')
+		players[socket.id] = name;
+		//console.log(players)
+	});
+	socket.on('exchange_names', ()=>{
+		io.emit('here_is_my_name', {name: players[socket.id], socketid: socket.id});
+	})
+	socket.on('here_is_my_name', ({name, socketid})=>{
+		players[socketid] = name;
+		console.log(players)
+	})
+
 	socket.on('start-game', ({ playerSid, roomSid }) => {
+		console.log(id, socket.id);
+		
+
+
 		const order = [...io.sockets.sockets.keys()];
-		console.log(order);
+		//console.log(order);
 		order.splice(order.indexOf(socket.id), 1);
 		order.unshift(socket.id);
 
-		console.log(order);
+		//console.log(order);
 
 		const roomInfo = {};
 
@@ -82,7 +104,9 @@ io.on("connection", socket => {
 		console.log(number_turns)
 		io.to(order[roomInfo.curIndex]).emit('your-turn', {prompt_num: number_turns});
 	});
-
+	
+	//id is undefined here
+	
 	socket.on('reveal-joke', (data) => {
 		console.log("console joke",data.text);
 		io.emit('joke-revealed', {joke: data.text});

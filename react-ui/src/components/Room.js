@@ -34,6 +34,8 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 	const [joke, setjoke] = useState('');
 	const [prompt, setprompt] = useState('');
 	const [numturns, setnumturns] = useState(0);
+	const [Name, setName] = useState('');
+	const [Socketid, setSocketid] = useState('');
 	const otherPlayers = players.map(p => <Player key={p.sid} player={p} socket={socket} roomSid={room.sid} inGame={status === 'reveal'} status={status}/>);
 
 
@@ -86,7 +88,11 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			room.on('participantDisconnected', playerLeft);
 			room.participants.forEach(playerJoined);
 
+
+			//console.log(Name);
 			socket.on('game-started', () => {
+				socket.emit('exchange_names');
+				//console.log('exchange names')
 				setStatus(statuses[1]) 
 			});
 			socket.on('your-turn', ({prompt_num}) => {
