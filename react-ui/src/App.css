@@ -63,7 +63,8 @@ video {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-height: 50vh;
+	flex-direction: column;
+	height: 100vh;
 }
 
 #sidebar {
@@ -74,6 +75,7 @@ video {
 	z-index: 1;
 	width: 200px;
 	padding: 15px;
+	box-shadow: 2px 2px 30px rgba(0, 0, 0, 0.57);
 }
 
 #main {
@@ -105,25 +107,21 @@ video {
   transform: translateY(-50%);
 }
 .infoWindow {
-	height: 200px;
-	width: 50%;
-	background-color: greenyellow;
+	/* height: 200px; */
+	/* width: 50%; */
+	/* background-color: greenyellow; */
 	font-size: 40px;
 	font-weight: 100;
 	overflow: hidden; 
  	position: relative;
+	text-align: left;
+	color: white;
 }
 .infoWindowBoundingBox {
 	height: 50%;
 	width: 100%;
 }
 
-#start {   
-	border: 1px;
-	padding: 5px;
-	margin-left:25%;
-	margin-top: 10%;
-}
 #player-video {
 	border: 10px solid;
 	border-color: #1A759F;
