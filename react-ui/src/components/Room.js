@@ -247,9 +247,9 @@ const Standings = ({ roomCode, socket }) => {
 	const [scores, setScores] = useState([]);
 	const [players, setPlayers] = useState([]);
 	var scoreMap = [];
-	var col1 = [<h2>Standings</h2>];
-	var col2 = [<h2>Name</h2>];
-	var col3 = [<h2>Score</h2>]
+	var col1 = [<h2 id ="standings1">Standings</h2>];
+	var col2 = [<h2 id = "standings2">Name</h2>];
+	var col3 = [<h2 id = "standings3">Score</h2>]
 	const suffix = (n) => {
 		let a = n % 10;
 		let b = n % 100;

@@ -144,3 +144,13 @@ h6 {
 	color:rgba(14, 96, 107,1);
 	padding-top: 3ch;
 }
+
+#standings1 {
+	color: #99D98C;
+}
+#standings2 {
+	color: #34A0A4;
+}
+#standings3{
+	color: #1E6091;
+}
