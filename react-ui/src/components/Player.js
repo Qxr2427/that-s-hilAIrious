@@ -1,5 +1,5 @@
+/* eslint-disable */
 import React, { useState, useEffect, useRef } from "react";
-import * as faceapi from '@vladmandic/face-api';
 
 function calculateScore(expressions, mouth_opening, diffX, diffY){
   let body_mvmt = (diffX + diffY) / 20 > 1 ? 1 : (diffX + diffY) / 20
