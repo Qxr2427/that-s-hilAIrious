@@ -106,7 +106,7 @@ const Player = ({ isLocalParticipant, player, socket, roomSid, inGame }) => {
       console.log(scores);
       for (var id in players) {
         if (players[id] === player.identity){
-          setscore(scores[id].finalScore)
+          setscore(scores[id].finalScore ? scores[id].finalScore : 50.32)
           break
         }
       }
