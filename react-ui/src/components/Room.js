@@ -74,9 +74,9 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		socket.emit('next-turn', {
 			playerSid: room.localParticipant.sid,
 			roomSid: room.sid,
-			num_turns: numturns - 1
+			num_turns: numturns + 1
 		});
-		console.log("minus one ",numturns-1)
+		console.log("minus one ",numturns + 1)
 	}, [room,numturns]);
 	
 	useEffect(() => {
@@ -251,11 +251,12 @@ const BeforeStart = ({ roomCode, handleStartGame }) => {
 			<h1>{roomCode}</h1>
 			<button onClick={handleStartGame}>Start Game</button>
 			<div id="instructions">
-				<p style={{ fontSize: "30px", color: "white" }}>Rules: 
+				<p style={{ fontSize: "30px", color: "white" }}><b>Rules: </b>
 					Answer the prompt, make your friends laugh!
-					Look at your funny score to see how funny you are :)
+					Your funny score is determined by how hard they laugh :)
+					We'll tell you if you're funny or not. 
 				</p>
-				<p style={{ fontSize: "30px", color: "white" }}>Round length: 10 seconds</p>
+				<p style={{ fontSize: "30px", color: "white" }}><b>Round length:</b> 10 seconds</p>
 			</div>
 		</div>
 	);
@@ -293,8 +294,13 @@ const Standings = ({ roomCode, socket }) => {
 		}
 		let l = Object.keys(scoreMap).length;
 		const sortedMap = Object.entries(scoreMap).sort((a, b)=> b[1] - a[1])
-		for (var i = 1; i <= l; ++i) {
-			col1.push(<p>{suffix(i)}</p>); 
+		var rank = 0;
+		for (var i = 1; i <= l; i++) {
+			if (!sortedMap[i-1][0] || sortedMap[i-1][0] == 'undefined' || sortedMap[i-1][0] == undefined) {
+				continue;
+			}
+			rank++;
+			col1.push(<p>{suffix(rank)}</p>);
 			col2.push(<p>{sortedMap[i-1][0]}</p>);
 			col3.push(<p>{Math.floor(sortedMap[i-1][1])}</p>);
 		}

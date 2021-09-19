@@ -155,7 +155,6 @@ h6 {
 }
 
 #instructions {
-	height: 180px;
 	width: 500px;
 	bottom:0;
 	right:0;
@@ -169,6 +168,7 @@ h6 {
 	padding-top: 1ch;
 	padding-left: 15px;
 	padding-right: 10px;
+	padding-bottom: 1ch;
 }
 .prompt-box {
 	height: 40%;

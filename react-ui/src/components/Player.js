@@ -114,11 +114,11 @@ const Player = ({ isLocalParticipant, player, socket, roomSid, inGame, curID }) 
   useEffect(()=>{
     socket.on('progress_check',({players, prev, max_scores})=>{
       if (players[prev] === player.identity){
-        if (max_scores < 20){
+        if (max_scores <= 40){
           setfunny_status(funny[1]);
-        }  else if (max_scores > 20){
+        }  else if (max_scores > 40){
           setfunny_status(funny[2]);
-        } else if (max_scores > 25){
+        } else if (max_scores > 45){
           setfunny_status(funny[3]);
         } else if(max_scores > 50){
           setfunny_status(funny[4]);
