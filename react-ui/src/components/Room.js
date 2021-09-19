@@ -184,13 +184,22 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				<div className="vertical-center">
 					{status === 'before-start' && <BeforeStart roomCode={roomCode} handleStartGame={handleStartGame} />}
 					{(status === 'prompt') && (
-						<div className='infoWindowBoundingBox'>
+						<>
+						{yourTurn &&
+						<div className='infoWindowBoundingBox' style={{ position: 'absolute', left: '-250px' }}>
 						<Anime translateX={250}>
-							<Anime delay={3000} translateX={250} opacity={0}>
-						<div className='infoWindow'>{`PROMPT!: ${prompt}`}</div>
+						<Anime delay={3000} translateX={250} opacity={0}>
+						<div className='infoWindow'>Your turn!</div>
 						</Anime>
 						</Anime>
 						</div>
+						}
+						<div className='infoWindowBoundingBox'>
+						<Anime delay={yourTurn ? 3500 : 0} opacity={[0, 100]} duration={300}>
+								<div className='infoWindow'>{`PROMPT: ${prompt}`}</div>
+						</Anime>
+						</div>
+						</>
 					)}
 					
 					{(status === 'prompt' && yourTurn) && ( 
@@ -203,11 +212,15 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 									// placeholder="Name"
 									onChange={handleChange}
 									value={joke}
+									autoComplete="off"
 								/>		
+								<button type="submit">Done!</button>
 							</form>
 						</div>
 					)}
-					{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
+					{(status === 'turn-end') && (
+						<button onClick={handleNextTurn}>Next turn</button>
+					)}
 					{(status === 'reveal') && <h1>{`${joke}`}</h1>}
 					{(status === 'game-end') && (
 						<div>
@@ -236,7 +249,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 const BeforeStart = ({ roomCode, handleStartGame }) => {
 	return (
 		<div id="before-start">
-			<p style={{ fontSize: "30px", color: "white" }}>To join, go to htn2021.game.com and enter the code:</p>
+			<p style={{ fontSize: "30px", color: "white" }}>To join, go to thats-hilairious.herokuapp.com and enter the code:</p>
 			<h1>{roomCode}</h1>
 			<button onClick={handleStartGame}>Start Game</button>
 		</div>
