@@ -94,6 +94,9 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				//console.log('exchange names')
 				setStatus(statuses[1]) 
 			});
+			socket.on('here_is_my_name', ({name, socketid})=>{
+				socket.emit('back_to_you', ({name: name, socketid: socketid}))
+			})
 			socket.on('your-turn', ({prompt_num}) => {
 				 //prompt status
 				//choose prompt

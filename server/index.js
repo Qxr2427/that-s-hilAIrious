@@ -69,9 +69,9 @@ io.on("connection", socket => {
 	socket.on('exchange_names', ()=>{
 		io.emit('here_is_my_name', {name: players[socket.id], socketid: socket.id});
 	})
-	socket.on('here_is_my_name', ({name, socketid})=>{
+	socket.on('back_to_you', ({name, socketid})=>{
 		players[socketid] = name;
-		console.log(players)
+		//console.log("my name", players[socket.id], "my list", players)
 	})
 
 	socket.on('start-game', ({ playerSid, roomSid }) => {
