@@ -71,7 +71,7 @@ io.on("connection", socket => {
 		roomInfo.curIndex = 0;
 		roomInfo.scores = {};
 		roomInfo.order.forEach(id => roomInfo.scores[id] = {
-			max10Score: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			maxScores: [],
 			totalScore: 0,
 			totalCount: 0,
 			finalScore: 0
@@ -92,12 +92,19 @@ io.on("connection", socket => {
 		}, 10000);
 	})
 	socket.on('process_score', (data) => {
+		console.log("received score: ")
+		console.log(data);
 		let cur_score = data.cur_score;
-		games[roomSid].scores.totalScore += cur_score;
-		scores.totalCount += 1;
-		scores.max10Score.push(cur_score);
-		scores.max10Score.sort(function (a, b) {  return a - b;  });
-		scores.max10Score = max10Score.slice(1);
+		let speaker_id = games[data.roomSid].order[games[data.roomSid].curIndex]
+		if (socket.id != speaker_id) {
+			games[data.roomSid].scores[speaker_id].totalScore += cur_score;
+			games[data.roomSid].scores[speaker_id].totalCount += 1;
+			games[data.roomSid].scores[speaker_id].maxScores.push(cur_score);
+			if (games[data.roomSid].scores[speaker_id].maxScores.length > 10 * (games[data.roomSid].order.length - 1)) {
+				games[data.roomSid].scores[speaker_id].maxScores.sort(function (a, b) {  return a - b;  });
+				games[data.roomSid].scores[speaker_id].maxScores.shift();
+			}	
+		}
 	})
 	socket.on('prompt', ({prompt})=>{
 		io.emit('update_prompt', {prompt: prompt})
@@ -108,8 +115,14 @@ io.on("connection", socket => {
 		//console.log(num_turns);
 	})
 	socket.on('next-turn', ({ playerSid, roomSid, num_turns }) => {
+		let prev_speaker = games[roomSid].order[games[roomSid].curIndex]
+		let scores = games[roomSid].scores[prev_speaker]
+		let max_scores_avg = scores.maxScores.reduce((pv, cv) => pv + cv, 0) / scores.maxScores.length
+		scores.finalScore = scores.totalScore / scores.totalCount * 0.25 + max_scores_avg * 0.75
+		console.log(scores)
 		games[roomSid].curIndex++;
 		if (games[roomSid].curIndex >= games[roomSid].order.length) {
+			console.log("gameend")
 			io.emit('game-ended')
 			return;
 		}

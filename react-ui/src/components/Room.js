@@ -31,7 +31,15 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 	const [joke, setjoke] = useState('');
 	const [prompt, setprompt] = useState('');
 	const [numturns, setnumturns] = useState(0);
-	const otherPlayers = players.map(p => <Player key={p.sid} player={p} socket={socket} />);
+	const otherPlayers = () => {
+		return (
+			players.map(p => 
+				<Player key={p.sid} player={p} socket={socket} roomSid={room.sid}
+					inGame={status === 'reveal'}
+					status={status} />
+				)
+		)
+	}
 
 	const handleStartGame = useCallback(() => {
 		socket.emit('start-game', {
@@ -97,7 +105,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				socket.emit('my-turn', { playerSid: room.localParticipant.sid });
 			});
 			socket.on('others-turn', ({ otherSid }) => {
-				setStatus(statuses[2]);
+				setStatus(statuses[3]);
 				setYourTurn(false);
 			});
 			socket.on('update_prompt', ({prompt})=>{
@@ -169,13 +177,16 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
             key={room.localParticipant.sid}
             player={room.localParticipant}
 						socket={socket}
+						roomSid={room.sid}
+						inGame={status === 'reveal'}
+						status={status}
           />
         ) : (
           ''
         )}
       </div>
       <h3>Remote Participants</h3>
-      <div className="remote-participants">{otherPlayers}</div>
+      <div className="remote-participants">{otherPlayers()}</div>
 		</div>
 	)
 };
