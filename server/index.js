@@ -116,7 +116,7 @@ io.on("connection", socket => {
 			} else {
 				io.emit('turn-finished');
 			}
-		}, 50);
+		}, 10000);
 	})
 	socket.on('show-standings',(data) => {
 		socket.emit('standings', {scores: games[data.roomSid].scores, players: players})
