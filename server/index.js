@@ -88,6 +88,11 @@ io.on("connection", socket => {
 		io.emit('joke-revealed', {joke: data.text});
 		setTimeout(() => {
 			if (games[data.roomSid].curIndex >= games[data.roomSid].order.length - 1) {
+				let prev_speaker = games[data.roomSid].order[games[data.roomSid].curIndex]
+				let scores = games[data.roomSid].scores[prev_speaker]
+				let max_scores_avg = scores.maxScores.reduce((pv, cv) => pv + cv, 0) / scores.maxScores.length
+				scores.finalScore = scores.totalScore / scores.totalCount * 0.25 + max_scores_avg * 0.75
+				console.log(scores)
 				io.emit('game-ended')
 			} else {
 				io.emit('turn-finished');
