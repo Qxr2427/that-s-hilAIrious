@@ -7,13 +7,12 @@ function calculateScore(expressions, mouth_opening, diffX, diffY){
   let other_expressions = expressions.surprised * 0.2 - expressions.angry * 0.5 - expressions.disgusted * 0.5 - expressions.fearful * 0.3 - expressions.sad * 0.8;
   return 100 * (expressions.happy * 0.5 + laugh_score * 0.4 + body_mvmt * 0.1 + other_expressions)
 }
-
-const Player = ({ isLocalParticipant, player, socket }) => {
+const Player = ({ isLocalParticipant, player, socket, roomSid, inGame }) => {
   const [videoTracks, setVideoTracks] = useState([]);
   const [audioTracks, setAudioTracks] = useState([]);
   const videoRef = useRef();
   const audioRef = useRef();
-  
+  const [score, setscore] = useState(0);
   const trackpubsToTracks = (trackMap) =>
     Array.from(trackMap.values())
       .map((publication) => publication.track)
@@ -26,25 +25,27 @@ const Player = ({ isLocalParticipant, player, socket }) => {
     let reference_size = 0
     let cur_score;
     let flag = false
-    const scoreInterval = setInterval(async () => {
-      const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
-      if (!detections[0]) return;
-      let diffX = Math.abs(prevX - detections[0].detection._box.x )
-      let diffY = Math.abs(prevY - detections[0].detection._box.y )
-      prevX = detections[0].detection._box.x
-      prevY = detections[0].detection._box.y
-      let mouth_size = detections[0].landmarks.positions[57].y - detections[0].landmarks.positions[51].y
-      if (!flag) {
-        reference_size = mouth_size - 8
-        flag = true
-      }
-      cur_score = calculateScore(detections[0].expressions, (mouth_size - reference_size) * 0.05, diffX, diffY)
-      socket.emit('cur_score', {current_score: cur_score})
-    }, 500);
-
-		return () => {
-			clearInterval(scoreInterval);
-		}
+    var interval
+    if (inGame) {
+      interval = setInterval(async () => {
+        const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
+        if (!detections[0]) return;
+        let diffX = Math.abs(prevX - detections[0].detection._box.x )
+        let diffY = Math.abs(prevY - detections[0].detection._box.y )
+        prevX = detections[0].detection._box.x
+        prevY = detections[0].detection._box.y
+        let mouth_size = detections[0].landmarks.positions[57].y - detections[0].landmarks.positions[51].y
+        if (!flag) {
+          reference_size = mouth_size - 8
+          flag = true
+        }
+        cur_score = calculateScore(detections[0].expressions, (mouth_size - reference_size) * 0.05, diffX, diffY)
+        socket.emit('process_score', {cur_score: cur_score, roomSid: roomSid})
+        console.log("Sent")
+        socket.on('turn-finished', () => clearInterval(interval))
+        socket.on('game-ended', () => clearInterval(interval))
+      }, 1000)
+    }
 	})
 
   useEffect(() => {
@@ -96,10 +97,21 @@ const Player = ({ isLocalParticipant, player, socket }) => {
       };
     }
   }, [audioTracks]);
+
+  useEffect(()=>{
+    socket.on('score_update', ({scores})=>{
+      //console.log("score update",scores[socket.id].finalScore);
+      //console.log("once", scores);
+      //console.log(socket.id);  //executes multiple times
+      setscore(scores[socket.id].finalScore)
+    });
+    //[socket.id]
+  },[]);
   return (
     <div className="player">
       <video ref={videoRef} autoPlay={true} style={{ transform: isLocalParticipant ? 'rotateY(180deg)' : '' }}/>
       <audio ref={audioRef} autoPlay={true} />
+      <h6>{`${score}`}</h6>
       <p style={{textAlign: 'center'}}>{player.identity}{isLocalParticipant && " (you)"}</p>
     </div>
   );

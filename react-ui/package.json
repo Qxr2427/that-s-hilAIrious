@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "react": "^16.14.0",
+    "react-anime": "^4.1.1",
     "react-dom": "^16.14.0",
     "react-scripts": "^3.4.0",
     "socket.io-client": "^4.2.0",

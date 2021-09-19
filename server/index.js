@@ -69,7 +69,12 @@ io.on("connection", socket => {
 		roomInfo.order = order;
 		roomInfo.curIndex = 0;
 		roomInfo.scores = {};
-		roomInfo.order.forEach(id => roomInfo.scores[id] = 0);
+		roomInfo.order.forEach(id => roomInfo.scores[id] = {
+			maxScores: [],
+			totalScore: 0,
+			totalCount: 0,
+			finalScore: 0
+		});
 
 		games[roomSid] = roomInfo;
 		io.emit('game-started');
@@ -83,11 +88,32 @@ io.on("connection", socket => {
 		io.emit('joke-revealed', {joke: data.text});
 		setTimeout(() => {
 			if (games[data.roomSid].curIndex >= games[data.roomSid].order.length - 1) {
+				let prev_speaker = games[data.roomSid].order[games[data.roomSid].curIndex]
+				let scores = games[data.roomSid].scores[prev_speaker]
+				let max_scores_avg = scores.maxScores.reduce((pv, cv) => pv + cv, 0) / scores.maxScores.length
+				scores.finalScore = scores.totalScore / scores.totalCount * 0.25 + max_scores_avg * 0.75
+				//game over condition
+				console.log(scores)
 				io.emit('game-ended')
 			} else {
 				io.emit('turn-finished');
 			}
 		}, 10000);
+	})
+	socket.on('process_score', (data) => {
+		console.log("received score: ")
+		console.log(data);
+		let cur_score = data.cur_score;
+		let speaker_id = games[data.roomSid].order[games[data.roomSid].curIndex]
+		if (socket.id != speaker_id) {
+			games[data.roomSid].scores[speaker_id].totalScore += cur_score;
+			games[data.roomSid].scores[speaker_id].totalCount += 1;
+			games[data.roomSid].scores[speaker_id].maxScores.push(cur_score);
+			if (games[data.roomSid].scores[speaker_id].maxScores.length > 10 * (games[data.roomSid].order.length - 1)) {
+				games[data.roomSid].scores[speaker_id].maxScores.sort(function (a, b) {  return a - b;  });
+				games[data.roomSid].scores[speaker_id].maxScores.shift();
+			}	
+		}
 	})
 	socket.on('prompt', ({prompt})=>{
 		io.emit('update_prompt', {prompt: prompt})
@@ -98,9 +124,18 @@ io.on("connection", socket => {
 		//console.log(num_turns);
 	})
 	socket.on('next-turn', ({ playerSid, roomSid, num_turns }) => {
+		
+		console.log("next turn");
+		//send score to visual
+		let prev_speaker = games[roomSid].order[games[roomSid].curIndex]
+		let scores = games[roomSid].scores[prev_speaker]
+		let max_scores_avg = scores.maxScores.reduce((pv, cv) => pv + cv, 0) / scores.maxScores.length
+		scores.finalScore = scores.totalScore / scores.totalCount * 0.25 + max_scores_avg * 0.75
+		io.emit('score_update', {scores: games[roomSid].scores});
+		//console.log(scores)
 		games[roomSid].curIndex++;
-
 		io.to(games[roomSid].order[games[roomSid].curIndex]).emit('your-turn', {prompt_num: num_turns});
+		
 	})
 
 	socket.on('my-turn', ({ playerSid }) => {

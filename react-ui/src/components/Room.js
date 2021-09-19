@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Video from 'twilio-video';
 import Player from './Player';
 import * as faceapi from '@vladmandic/face-api';
+import Anime, { anime } from 'react-anime';
+
+let colors = [ 'blue', 'green', 'red' ];
 
 const statuses = [
 	'before-start',
@@ -31,7 +34,8 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 	const [joke, setjoke] = useState('');
 	const [prompt, setprompt] = useState('');
 	const [numturns, setnumturns] = useState(0);
-	const otherPlayers = players.map(p => <Player key={p.sid} player={p} socket={socket} />);
+	const otherPlayers = players.map(p => <Player key={p.sid} player={p} socket={socket} roomSid={room.sid} inGame={status === 'reveal'} status={status}/>);
+
 
 	const handleStartGame = useCallback(() => {
 		socket.emit('start-game', {
@@ -97,7 +101,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				socket.emit('my-turn', { playerSid: room.localParticipant.sid });
 			});
 			socket.on('others-turn', ({ otherSid }) => {
-				setStatus(statuses[2]);
+				setStatus(statuses[2]); // this should be prompt
 				setYourTurn(false);
 			});
 			socket.on('update_prompt', ({prompt})=>{
@@ -148,6 +152,8 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 							key={room.localParticipant.sid}
 							player={room.localParticipant}
 							socket={socket}
+							roomSid={room.sid}
+							inGame={status === 'reveal'}
 						/>
 					) : (
 						''
@@ -157,12 +163,21 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 				<button onClick={handleLogout} style={{position: "absolute", bottom: '15px', justifyContent: 'center'}}>Exit game</button>
 			</div>
 			<div id="main">
-				<div class="vertical-center">
+				<div className="vertical-center">
 					{status === 'before-start' && <BeforeStart roomCode={roomCode} handleStartGame={handleStartGame} />}
-					{(status === 'prompt') && <h1>{`${prompt}`}</h1>/*display prompt for everyone*/ }
+					{(status === 'prompt') && (
+						<div className='infoWindowBoundingBox'>
+						<Anime translateX={250}>
+							<Anime delay={3000} translateX={250} opacity={0}>
+						<div className='infoWindow'>{`PROMPT!: ${prompt}`}</div>
+						</Anime>
+						</Anime>
+						</div>
+					)}
+					
 					{(status === 'prompt' && yourTurn) && ( 
-						<div id ="test">
-							<form id ="test" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
+						<div className="Joke bar">
+							<form className="Joke" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
 								<input
 									type="text"
 									id="joke"
@@ -176,6 +191,11 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 					)}
 					{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
 					{(status === 'reveal') && <h1>{`${joke}`}</h1>}
+					{(status === 'game-end') && (
+						<Anime translateY={150}>
+							<h1>GAME OVER!</h1>
+						</Anime>
+					)}
 				</div>
 			</div>
 			<div id="dev-stats">
