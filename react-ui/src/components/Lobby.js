@@ -10,9 +10,7 @@ const Lobby = ({
 }) => {
 	return (
 		<div id="lobby">
-			{/* <Anime transformX={50}>
-			<img src="emoji_laugh.png"></img>
-			</Anime> */}
+			
 			<div id = "start">
 			<img src= {require("./hilarious.png")}></img>
 			</div>

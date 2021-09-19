@@ -122,8 +122,8 @@ const Player = ({ isLocalParticipant, player, socket, roomSid, inGame, curID }) 
     <div className="player">
       <video id="player-video" ref={videoRef} autoPlay={true} style={{ transform: isLocalParticipant ? 'rotateY(180deg)' : '' }}/>
       <audio ref={audioRef} autoPlay={true} />
-      <h5>{`${score}`}</h5>
-      <p style={{textAlign: 'center'}}>{player.identity}{isLocalParticipant && " (you)"}</p>
+      <h5>{`Round Score: ${score}`}</h5>
+      <h6>{player.identity}{isLocalParticipant && " (you)"}</h6>
     </div>
   );
 };
