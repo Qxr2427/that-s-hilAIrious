@@ -196,7 +196,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 						}
 						<div className='infoWindowBoundingBox'>
 						<Anime delay={yourTurn ? 3500 : 0} opacity={[0, 100]} duration={300}>
-								<div className='infoWindow'>{`PROMPT: ${prompt}`}</div>
+								<div className='prompt-box'><h4>PROMPT:</h4>{`${prompt}`}</div>
 						</Anime>
 						</div>
 						</>
@@ -219,7 +219,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 						</div>
 					)}
 					{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
-					{(status === 'reveal') && <div><h1>{`${prompt}`}</h1><h1>{`${joke}`}</h1></div>}
+					{(status === 'reveal') && <div id="prompt-box"><h1>{`${prompt}`}</h1><h1>{`${joke}`}</h1></div>}
 					{(status === 'game-end') && (
 						<div>
 							<Anime translateY={150}>
@@ -235,11 +235,6 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 					{(status === 'standings') && <Standings roomCode={room.sid} socket={socket} />}
 				</div>
 			</div>
-			<div id="dev-stats">
-				<p>{status}</p>
-				<p>Your turn? {`${yourTurn}`}</p>
-				<p>CURRENT JOKE? {`${joke}`}</p>
-			</div>
 		</div>
 	)
 };
@@ -250,6 +245,13 @@ const BeforeStart = ({ roomCode, handleStartGame }) => {
 			<p style={{ fontSize: "30px", color: "white" }}>To join, go to thats-hilairious.herokuapp.com and enter the code:</p>
 			<h1>{roomCode}</h1>
 			<button onClick={handleStartGame}>Start Game</button>
+			<div id="instructions">
+				<p style={{ fontSize: "30px", color: "white" }}>Rules: 
+					Answer the prompt, make your friends laugh!
+					Look at your funny score to see how funny you are :)
+				</p>
+				<p style={{ fontSize: "30px", color: "white" }}>Round length: 10 seconds</p>
+			</div>
 		</div>
 	);
 }
