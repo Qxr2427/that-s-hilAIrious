@@ -74,9 +74,9 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		socket.emit('next-turn', {
 			playerSid: room.localParticipant.sid,
 			roomSid: room.sid,
-			num_turns: numturns - 1
+			num_turns: numturns + 1
 		});
-		console.log("minus one ",numturns-1)
+		console.log("minus one ",numturns + 1)
 	}, [room,numturns]);
 	
 	useEffect(() => {
@@ -289,7 +289,11 @@ const Standings = ({ roomCode, socket }) => {
 		let l = Object.keys(scoreMap).length;
 		const sortedMap = Object.entries(scoreMap).sort((a, b)=> b[1] - a[1])
 		for (var i = 1; i <= l; ++i) {
-			col1.push(<h2>{suffix(i)}</h2>); 
+			if (sortedMap[i-1][0] == undefined) {
+				--i;
+				continue;
+			}
+			col1.push(<h2>{suffix(i)}</h2>);
 			col2.push(<h2>{sortedMap[i-1][0]}</h2>);
 			col3.push(<h2>{Math.floor(sortedMap[i-1][1])}</h2>);
 		}
