@@ -54,14 +54,14 @@ video {
 	width: 170px;
 	height: 170px;
 }
-
+/* ADJUST LOBBY FORM AND START IDS FOR LOBBY PAGE */
 #lobby-form {
 	min-width: 50vw;
-	padding: 3vw;
+	padding: 2vw;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-height: 100vh;
+	min-height: 50vh;
 }
 
 #sidebar {
@@ -116,7 +116,18 @@ video {
 	width: 100%;
 }
 
-img {
-	border: 1px solid;
+#start {   
+	border: 1px;
 	padding: 5px;
+	margin-left:25%;
+	margin-top: 10%;
+}
+#player-video {
+	border: 10px solid;
+
+}
+h5 { 
+	color: #34A0A4;
+	font-size: medium;
+	text-align: center;
 }

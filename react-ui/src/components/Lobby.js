@@ -9,12 +9,15 @@ const Lobby = ({
 	handleSubmit,
 }) => {
 	return (
-		<div id="lobby-form">
+		<div id="lobby">
 			{/* <Anime transformX={50}>
 			<img src="emoji_laugh.png"></img>
 			</Anime> */}
+			<div id = "start">
+			<img src= {require("./hilarious.png")}></img>
+			</div>
+			<div id = "lobby-form">
 			<form onSubmit={handleSubmit}>
-				<h1>QUIPLASH</h1>
 				<input
 					type="text"
 					id="name"
@@ -36,6 +39,7 @@ const Lobby = ({
 				/>
 				<button type="submit">Join</button>
 			</form>
+			</div>
 		</div>
 	)
 };
