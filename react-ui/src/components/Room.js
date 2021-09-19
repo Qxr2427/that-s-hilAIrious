@@ -34,14 +34,8 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 	const [joke, setjoke] = useState('');
 	const [prompt, setprompt] = useState('');
 	const [numturns, setnumturns] = useState(0);
-	const otherPlayers = () => {
-		return (
-			players.map(p => 
-				<Player key={p.sid} player={p} socket={socket} roomSid={room.sid}
-					inGame={status === 'reveal'}/>
-				)
-		)
-	}
+	const otherPlayers = players.map(p => <Player key={p.sid} player={p} socket={socket} roomSid={room.sid} inGame={status === 'reveal'} status={status}/>);
+
 
 	const handleStartGame = useCallback(() => {
 		socket.emit('start-game', {
