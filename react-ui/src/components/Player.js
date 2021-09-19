@@ -8,7 +8,7 @@ function calculateScore(expressions, mouth_opening, diffX, diffY){
   return 100 * (expressions.happy * 0.5 + laugh_score * 0.4 + body_mvmt * 0.1 + other_expressions)
 }
 
-const Player = ({ isLocalParticipant, player, socket, roomSid, inGame, status }) => {
+const Player = ({ isLocalParticipant, player, socket, roomSid, inGame }) => {
   const [videoTracks, setVideoTracks] = useState([]);
   const [audioTracks, setAudioTracks] = useState([]);
   const videoRef = useRef();
@@ -44,6 +44,7 @@ const Player = ({ isLocalParticipant, player, socket, roomSid, inGame, status })
         socket.emit('process_score', {cur_score: cur_score, roomSid: roomSid})
         console.log("Sent")
         socket.on('turn-finished', () => clearInterval(interval))
+        socket.on('game-ended', () => clearInterval(interval))
       }, 1000)
     }
 	})
@@ -99,9 +100,9 @@ const Player = ({ isLocalParticipant, player, socket, roomSid, inGame, status })
   }, [audioTracks]);
   return (
     <div className="player">
-      <h3>{player.identity}</h3>
-      <video ref={videoRef} autoPlay={true} />
+      <video ref={videoRef} autoPlay={true} style={{ transform: isLocalParticipant ? 'rotateY(180deg)' : '' }}/>
       <audio ref={audioRef} autoPlay={true} />
+      <p style={{textAlign: 'center'}}>{player.identity}{isLocalParticipant && " (you)"}</p>
     </div>
   );
 };

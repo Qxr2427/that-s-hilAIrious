@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Video from 'twilio-video';
 import Player from './Player';
 import * as faceapi from '@vladmandic/face-api';
+import Anime, { anime } from 'react-anime';
+
+let colors = [ 'blue', 'green', 'red' ];
 
 const statuses = [
 	'before-start',
@@ -16,10 +19,10 @@ const statuses = [
 var txt;
 
 const prompts = [
-	'prompt 1',
-	'prompt 2',
-	'prompt 3',
-	'prompt 4'
+	'The reason flamingos stand on one leg.',
+	'The worst thing to say or do after someone farts.',
+	'People who like this thing are the scum of the Earth.',
+	'The name of the man who invented urinals.'
 ]
 
 
@@ -35,8 +38,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 		return (
 			players.map(p => 
 				<Player key={p.sid} player={p} socket={socket} roomSid={room.sid}
-					inGame={status === 'reveal'}
-					status={status} />
+					inGame={status === 'reveal'}/>
 				)
 		)
 	}
@@ -124,6 +126,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 			})
 			socket.on('turn-finished', () => {
 				setStatus(statuses[5]);
+				setjoke('');
 			})
 			socket.on('game-ended', () => {
 				setStatus(statuses[6]);
@@ -147,48 +150,63 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 
 	return(
 		<div className="room">
-			<h2>Room: {roomCode}</h2>
-			<p>{status}</p>
-			<p>Your turn? {`${yourTurn}`}</p>
-			<p>CURRENT JOKE? {`${joke}`}</p>
-			{status === 'before-start' && <button onClick={handleStartGame}>Start Game</button>}
-			{(status === 'prompt') && <h1>{`${prompt}`}</h1>/*display prompt for everyone*/ }
-			{(status === 'prompt' && yourTurn) && ( <div id ="test">
-			
-			<form class="prompt" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
-			<input
-				type="text"
-				id="joke"
-				name="joke"
-				// placeholder="Name"
-				onChange={handleChange}
-				value={joke}
-			/>		
-			</form>
+			<div id="sidebar">
+				<div className="videos">
+					{room ? (
+						<Player
+							isLocalParticipant={true}
+							key={room.localParticipant.sid}
+							player={room.localParticipant}
+							socket={socket}
+							roomSid={room.sid}
+							inGame={status === 'reveal'}
+						/>
+					) : (
+						''
+					)}
+					{otherPlayers}
+				</div>
+				<button onClick={handleLogout} style={{position: "absolute", bottom: '15px', justifyContent: 'center'}}>Exit game</button>
 			</div>
-			)}
-			{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
-			{(status === 'reveal') && <h1>{`${joke}`}</h1>}
-      <button onClick={handleLogout}>Log out</button>
-      <div className="this-player">
-        {room ? (
-					<Player
-						isLocalParticipant={true}
-            key={room.localParticipant.sid}
-            player={room.localParticipant}
-						socket={socket}
-						roomSid={room.sid}
-						inGame={status === 'reveal'}
-						status={status}
-          />
-        ) : (
-          ''
-        )}
-      </div>
-      <h3>Remote Participants</h3>
-      <div className="remote-participants">{otherPlayers()}</div>
+			<div id="main">
+				<div class="vertical-center">
+					{status === 'before-start' && <BeforeStart roomCode={roomCode} handleStartGame={handleStartGame} />}
+					{(status === 'prompt') && <h1>{`${prompt}`}</h1>/*display prompt for everyone*/ }
+					{(status === 'prompt' && yourTurn) && ( 
+						<div id ="test">
+							<form id ="test" onSubmit={handleSubmitJoke}> {/*wtf form defaults to redirecting???*/} 
+								<input
+									type="text"
+									id="joke"
+									name="joke"
+									// placeholder="Name"
+									onChange={handleChange}
+									value={joke}
+								/>		
+							</form>
+						</div>
+					)}
+					{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
+					{(status === 'reveal') && <h1>{`${joke}`}</h1>}
+				</div>
+			</div>
+			<div id="dev-stats">
+				<p>{status}</p>
+				<p>Your turn? {`${yourTurn}`}</p>
+				<p>CURRENT JOKE? {`${joke}`}</p>
+			</div>
 		</div>
 	)
 };
+
+const BeforeStart = ({ roomCode, handleStartGame }) => {
+	return (
+		<div id="before-start">
+			<p style={{ fontSize: "30px", color: "white" }}>To join, go to htn2021.game.com and enter the code:</p>
+			<h1>{roomCode}</h1>
+			<button onClick={handleStartGame}>Start Game</button>
+		</div>
+	);
+}
 
 export default Room;

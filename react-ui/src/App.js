@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Lobby from './components/Lobby'
 import Room from './components/Room'
 import { io } from 'socket.io-client';
-// import './App.css';
+import './App.css';
 
 const socket = io('/');
 
@@ -12,7 +12,7 @@ const App = () => {
 	const [token, setToken] = useState('');
 
 	const handleNameChange = useCallback(event => setName(event.target.value), []);
-	const handleRoomCodeChange = useCallback(event => setRoomCode(event.target.value), []);
+	const handleRoomCodeChange = useCallback(event => setRoomCode(event.target.value.toUpperCase()), []);
 
 	const handleSubmit = useCallback(async event => {
 		event.preventDefault();
