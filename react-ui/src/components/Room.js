@@ -248,7 +248,8 @@ const BeforeStart = ({ roomCode, handleStartGame }) => {
 			<div id="instructions">
 				<p style={{ fontSize: "30px", color: "white" }}>Rules: 
 					Answer the prompt, make your friends laugh!
-					Look at your funny score to see how funny you are :)
+					Your funny score is determined by how hard they laugh :)
+					We'll tell you know if you're funny or not. 
 				</p>
 				<p style={{ fontSize: "30px", color: "white" }}>Round length: 10 seconds</p>
 			</div>
