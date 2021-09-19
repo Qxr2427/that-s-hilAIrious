@@ -290,7 +290,7 @@ const Standings = ({ roomCode, socket }) => {
 		const sortedMap = Object.entries(scoreMap).sort((a, b)=> b[1] - a[1])
 		var rank = 0;
 		for (var i = 1; i <= l; i++) {
-			if (!sortedMap[i-1][0]) {
+			if (!sortedMap[i-1][0] || sortedMap[i-1][0] == 'undefined' || sortedMap[i-1][0] == undefined) {
 				continue;
 			}
 			rank++;
