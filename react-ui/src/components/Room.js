@@ -188,14 +188,14 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 						{yourTurn &&
 						<div className='infoWindowBoundingBox' style={{ position: 'absolute', left: '-250px' }}>
 						<Anime translateX={250}>
-						<Anime delay={3000} translateX={250} opacity={0}>
+						<Anime delay={1500} translateX={250} opacity={0}>
 						<div className='infoWindow'>Your turn!</div>
 						</Anime>
 						</Anime>
 						</div>
 						}
 						<div className='infoWindowBoundingBox'>
-						<Anime delay={yourTurn ? 3500 : 0} opacity={[0, 100]} duration={300}>
+						<Anime delay={yourTurn ? 1600 : 0} opacity={[0, 100]} duration={300}>
 								<div className='prompt-box'><h4>PROMPT:</h4>{`${prompt}`}</div>
 						</Anime>
 						</div>
@@ -218,8 +218,13 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 							</form>
 						</div>
 					)}
-					{(status === 'turn-end') && <button onClick={handleNextTurn}>Next turn</button>}
-					{(status === 'reveal') && <div id="prompt-box"><h1>{`${prompt}`}</h1><h1>{`${joke}`}</h1></div>}
+					{(status === 'turn-end') && (
+						<>
+						<div className="prompt-box"><h4>{`Round over!`}</h4></div>
+						<button onClick={handleNextTurn}>Next turn</button>)
+						</>
+					)}
+					{(status === 'reveal') && <div className="prompt-box"><p>{`${prompt}`}</p><h4>{`${joke}`}</h4></div>}
 					{(status === 'game-end') && (
 						<div>
 							<Anime translateY={150}>
@@ -260,9 +265,9 @@ const Standings = ({ roomCode, socket }) => {
 	const [scores, setScores] = useState([]);
 	const [players, setPlayers] = useState([]);
 	var scoreMap = [];
-	var col1 = [<h2 id ="standings1">Standings</h2>];
-	var col2 = [<h2 id = "standings2">Name</h2>];
-	var col3 = [<h2 id = "standings3">Score</h2>]
+	var col1 = [<h4 id ="standings1">Standings</h4>];
+	var col2 = [<h4 id = "standings2">Name</h4>];
+	var col3 = [<h4 id = "standings3">Score</h4>]
 	const suffix = (n) => {
 		let a = n % 10;
 		let b = n % 100;
@@ -289,9 +294,9 @@ const Standings = ({ roomCode, socket }) => {
 		let l = Object.keys(scoreMap).length;
 		const sortedMap = Object.entries(scoreMap).sort((a, b)=> b[1] - a[1])
 		for (var i = 1; i <= l; ++i) {
-			col1.push(<h2>{suffix(i)}</h2>); 
-			col2.push(<h2>{sortedMap[i-1][0]}</h2>);
-			col3.push(<h2>{Math.floor(sortedMap[i-1][1])}</h2>);
+			col1.push(<p>{suffix(i)}</p>); 
+			col2.push(<p>{sortedMap[i-1][0]}</p>);
+			col3.push(<p>{Math.floor(sortedMap[i-1][1])}</p>);
 		}
 		console.log(sortedMap)
 		return;
@@ -299,10 +304,12 @@ const Standings = ({ roomCode, socket }) => {
 	generateBoard();
 
 	return ( 
+		<div className="prompt-box">
 		<div id="game-end" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gridGap: 20 }}>
 			<div>{col1}</div>
 			<div>{col2}</div>
 			<div>{col3}</div>
+		</div>
 		</div>
 	)
 }

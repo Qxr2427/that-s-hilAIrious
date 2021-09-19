@@ -172,7 +172,6 @@ h6 {
 }
 .prompt-box {
 	height: 40%;
-	width: 70%;
 	border-style: dashed;
 	border-radius: 10px;
 	box-shadow: 5px 5px;
@@ -186,5 +185,6 @@ h6 {
 	padding-bottom: 10px;
 	padding-left: 15px;
 	padding-top: 10px;
+	padding-right: 15px;
 	margin-bottom: 20px;
 }
