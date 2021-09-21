@@ -145,16 +145,16 @@ const Player = ({ isLocalParticipant, player, socket, roomSid, inGame, curID }) 
     
     <div className="player">
       
-      {(funny_status === 'unfunny') && <h2 id="overlay">UNFUNNY! :(</h2>}
-      {(funny_status === 'funny') && <h2 id="overlay">FUNNY!</h2>}
-      {(funny_status === 'really-funny') && <h2 id="overlay">really FUNNY!</h2>}
-      {(funny_status === 'hilarious') && <h2 id="overlay">hILaRiOuS!</h2>}
+      {(funny_status === 'unfunny') && <h2 id="overlay">👎</h2>}
+      {(funny_status === 'funny') && <h2 id="overlay">🔥</h2>}
+      {(funny_status === 'really-funny') && <h2 id="overlay">😆</h2>}
+      {(funny_status === 'hilarious') && <h2 id="overlay">😂</h2>}
       
       
       <video id="player-video" ref={videoRef} autoPlay={true} style={{ transform: isLocalParticipant ? 'rotateY(180deg)' : '' }}/>
       
       <audio ref={audioRef} autoPlay={true} />
-      <h5>{`Round Score: ${score}`}</h5>
+      <h5 style={{ fontSize: 20 }}>{`Round Score: ${score}`}</h5>
       <h6>{player.identity}{isLocalParticipant && " (you)"}</h6>
     </div>
   );
