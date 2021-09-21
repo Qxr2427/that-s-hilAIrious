@@ -239,7 +239,7 @@ const Room = ({ socket, roomCode, token, handleLogout }) => {
 	)
 };
 
-const BeforeStart = ({ roomCode, handleStartGame }) => {
+const BeforeStart = ({ roomCode, handleStartGame }) => { 
 	return (
 		<div id="before-start">
 			<p style={{ fontSize: "30px", color: "white" }}>To join, go to thats-hilairious.herokuapp.com and enter the code:</p>
