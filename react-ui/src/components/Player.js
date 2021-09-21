@@ -4,8 +4,8 @@ import Anime, { anime } from 'react-anime';
 function calculateScore(expressions, mouth_opening, diffX, diffY){
   let body_mvmt = (diffX + diffY) / 20 > 1 ? 1 : (diffX + diffY) / 20
   let laugh_score = mouth_opening > 1 ? 1 : mouth_opening
-  let other_expressions = expressions.surprised * 0.2 - expressions.angry * 0.5 - expressions.disgusted * 0.5 - expressions.fearful * 0.3 - expressions.sad * 0.8;
-  return 100 * (expressions.happy * 0.5 + laugh_score * 0.4 + body_mvmt * 0.1 + other_expressions)
+  //let other_expressions = expressions.surprised * 0.2 - expressions.angry * 0.5 - expressions.disgusted * 0.5 - expressions.fearful * 0.3 - expressions.sad * 0.8;
+  return 100 * (expressions.happy * 0.5 + laugh_score * 0.4 + body_mvmt * 0.1)
 }
 const Player = ({ isLocalParticipant, player, socket, roomSid, inGame, curID }) => {
   const funny = [
